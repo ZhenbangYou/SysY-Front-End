@@ -32,7 +32,7 @@ Divided in to 9 steps.
 |6|Constants|Recording Value in Symbol Table Entry|
 |7|Arrays|Offset & Constant Elements|
 |8|Initialization|Understanding the Semantic|
-|9|Reordering instructions (to obtain final result)|(Trivial)|
+|9|Instruction Reordering|(Trivial)|
 
 There is only one difficult part, namely step 4.  
 
@@ -79,4 +79,23 @@ Since we do in a one-pass style, this part is quite easy.
 Things like how to implement a symbol table for functions are so easy that I have no passion for talking about.  
 Parameter counting can be readily done by recording it in the terminal representing parameter list, which greatly shows the flexibility of *void\**.  
 Calling functions and getting return values are also easy.  
-But there is still one thing deserving furthur discussing: what if the source code does not have an *return* in some branches?  
+But there is still one thing deserving furthur discussing: what if the source code does not have a *return* in some branches?  
+One of my classmates asserted that he can perform checking in every branch. This sounds radical but I believe this is impossible.  
+Practically speaking, just add a *return* before the end of each function(recall Occam's razor).
+### Step 6 Constants
+I create an entry in symbol table for each constant, but I do not create a temporary variable for it. That being said, I emit the value of the constant every time I am confronted with it. Plus, every time an operation is performed, I check whether all the source operands are constants; if they are, the destination operand will also be a constant, thus no temporary variable being created.  
+You may find out that this is not suitable for arrays of constants, as the subscripts can be variables. This is true. Nonetheless, based on my principles, I choose to delay it until I need to deal with arrays.  
+### Step 7 Arrays
+Basically, for arrays of variables, things are just about calculating offsets from subscripts, which can be done by *std::deque*(deque supports pushing and popping from the front, compared with vector). Array definitions and array accesses are mostly the same. Note that the dimension of subscripts can be less than that of the array.
+For arrays of constants, things are just slightly more: we will need to calculate the value when the subscripts are all constants, which can be done by adding a *std::vector* in symbol table entry. In additions, arrays of constants need names.
+### Step 8 Initializations
+At the beginning, I did not even understand the semantic of intialization lists. In other words, I cannot even accomplish array initializations manually. Thanks to our group members, I finally get through it. The semantic rules are as follows:
+  - Each pair of braces is responsible for the initialization of an array, with the outmost one responsible for the entire array.  
+  - Every time confronted with a left brace, the dimension of array decrements, while a right brace means an increment.  
+  - If there are not enough elements within a pair of braces, the remaining elements are set to 0.  
+
+As long as you can comprehend the aforementioned rules, implementations will be easy. One assignment is needed for each initialization and one additional recording will be needed if it is a constant.  
+### Step 9 Intruction Reordering
+Well, it is far too trivial ... .  
+## Acknowledgments
+Thanks to my classmates, group members and roomates, also teaching assitants. Without their help, the design and implementation of this project will surely not be so smooth.  
