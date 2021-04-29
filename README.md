@@ -77,7 +77,8 @@ Since we do in a one-pass style, this part is quite easy.
 ### Step 4 *if* & *while*
 As is known to all, *if* and *while* each need 3 labels.  
 The problem is how to implement short circuit by one pass? There are much easier ways to implement it with two passes, which is discussed in page 408, section 6.6.6 of *Dragon Book*.  
-I admit this is the most difficult and the only difficult part of this project. The SDT (Syntax-Directed Translation Scheme) is as follows:  
+I admit this is the most difficult and the only difficult part of this project.  
+Before starting, let's think about its feasibility. Theoretically speaking, since it can be implemented as an L-attributed SDT (Syntax-Directed Translation Scheme) on an LL grammar and every grammar of this kind can be converted into an L-attributed SDT on an LR grammar, I am confident that there must be means to solve this. Interestingly, the hardest part needs the least code, as the following SDT shows (note that the following pseudo-code should be modified to be recognized in *Yacc*):  
 ```
 Cond->{LOrExp.True=Cond.True;} LOrExp {print("goto Cond.False");}
 LAndExp->EqExp {print("ifFalse EqExp goto LAndExp.False");}
