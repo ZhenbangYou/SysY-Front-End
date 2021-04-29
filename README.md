@@ -8,11 +8,11 @@ I feel it quite necessary to record my thoughts about the planning and developin
 
 ## Usage
 ```Bash
-git clone --recursive https://github.com/ZhenbangYou/SysY-Front-End.git  
+git clone https://github.com/ZhenbangYou/SysY-Front-End.git  
 cd SysY-Front-End  
-flex -o lex.yy.cpp lexer.l  
+flex -o lexer.yy.cpp lexer.l  
 bison -d -o parser.tab.cpp parser.y  
-g++ -Wno-register -O2 -lm -std=c++17 lex.yy.cpp parser.tab.cpp -o compiler -Idirs  
+g++ -Wno-register -O2 -lm -std=c++17 lexer.yy.cpp parser.tab.cpp -o compiler -Idirs  
 ./compiler -S -e source_code(SysY) -o destination(Eeyore)
 ```
 
@@ -74,7 +74,10 @@ Therefore, life is still easy. We only need to set up a stack of symbol tables, 
 ### Step 3 Expressions & Statements
 Since we do in a one-pass style, this part is quite easy.
 ### Step 4 *if* & *while*
-
+As is known to all, *if* and *while* each need 3 labels.  
+The problem is how to implement short circuit by one pass? There are much easier ways to implement it with two passes, which is discussed in page 408, section 6.6.6 of *Dragon Book*.  
+I admit this is the most difficult and the only difficult part of this project.  
+Let's talk about this more formally. Each short circuit expression is a two-level hierarchy, with the higher level being the result of *||* and the lower level being the result of *&&*. Call everything below the lower level "atom" since it can be work out directly.  
 ### Step 5 Functions
 Things like how to implement a symbol table for functions are so easy that I have no passion for talking about.  
 Parameter counting can be readily done by recording it in the terminal representing parameter list, which greatly shows the flexibility of *void\**.  
