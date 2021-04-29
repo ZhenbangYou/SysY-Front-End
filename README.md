@@ -29,7 +29,7 @@ Divided in to 9 steps.
 |3|Expressions & Statements|(Easy)|
 |4|*if* & *while*|Circuit Expressions|
 |5|Functions|(Easy)|
-|6|Constants|Recording Value in Symbol Table Entry|
+|6|Constants|Value Recording|
 |7|Arrays|Offset & Constant Elements|
 |8|Initialization|Understanding the Semantic|
 |9|Instruction Reordering|(Trivial)|
