@@ -65,6 +65,9 @@ In additions, incremental developing helps a lot. Specifically, by dividing the 
 ### Step 1 REX & CFG
 Regular expressions are quite easy to write, at least except for multiple-line comments, which can be done by translating a DFA. Maybe the fatal thing is not to leave out "\r".  
 Context free grammars are easy too, although a liiter harder than REX. Modifications of given EBNF is indispensible, which can be done mechanically. Whereas, there is something like associativity that requires further thinking, which may be delayed to latter parts, however.  
+The most important things of this step are the following two:  
+  - Type of *yylval*, namely *YYSTYPE*. For flexibility, I choose *void**.  
+  - What to store in *yylval*. My lexer just does the minimum: for identifier, store itself; for number, store the integer value it represents.  
 ### Step 2 Variable Declarations
 Now we only care about variables other than constants. We do not care about functions parameters and initializations either.  
 Therefore, life is still easy. We only need to set up a stack of symbol tables, which can be easily done with the help of *std::unordered_map* and *std::vector*.  
@@ -73,3 +76,5 @@ Since we do in a one-pass style, this part is quite easy.
 ### Step 4 *if* & *while*
 
 ### Step 5 Functions
+Things like how to implement a symbol table for functions are so easy that I have no passion for talking about.  
+Parameter counting can be readily done by recording it in the terminal representing parameter list, which greatly shows the flexibility of *void**
