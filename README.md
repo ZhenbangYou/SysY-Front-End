@@ -25,3 +25,5 @@ Divided in to 8 steps.
 |Step|Task(s)|Core|
 |:---|:---|:---|
 |1|REX & CFG|Modifying EBNF|
+|2|Variable declarations|Scope|
+|3|Expressions & Statements| |
