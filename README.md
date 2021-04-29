@@ -26,4 +26,10 @@ Divided in to 8 steps.
 |:---|:---|:---|
 |1|REX & CFG|Modifying EBNF|
 |2|Variable declarations|Scope|
-|3|Expressions & Statements| |
+|3|Expressions & Statements|(Easy)|
+|4|*if* & *while*|Circuit expressions|
+|5|Functions|(Easy)|
+|6|Constants|Recording value in symbol table entry|
+|7|Arrays|Offset & Constant elements|
+|8|Initialization|Understanding the semantic|
+|9|Reordering instructions (to obtain final result)|(Trivial)|
