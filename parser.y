@@ -9,7 +9,6 @@
 using namespace std;
 #define YYSTYPE void *
 extern FILE* yyin;
-extern FILE* yyout;
 extern int yylex();
 extern int yylineno;
 class WhileLoop;
