@@ -25,14 +25,20 @@ Divided in to 9 steps.
 |Step|Task(s)|Core|
 |:---|:---|:---|
 |1|REX & CFG|Modifying EBNF|
-|2|Variable declarations|Scope|
+|2|Variable Declarations|Scope|
 |3|Expressions & Statements|(Easy)|
-|4|*if* & *while*|Circuit expressions|
+|4|*if* & *while*|Circuit Expressions|
 |5|Functions|(Easy)|
-|6|Constants|Recording value in symbol table entry|
-|7|Arrays|Offset & Constant elements|
-|8|Initialization|Understanding the semantic|
+|6|Constants|Recording Value in Symbol Table Entry|
+|7|Arrays|Offset & Constant Elements|
+|8|Initialization|Understanding the Semantic|
 |9|Reordering instructions (to obtain final result)|(Trivial)|
+
+There is only one difficult part, namely step 4.  
+
+P.S.: One-pass scheme refers to the first 8 steps(step 9 is rather trivial), whose output is different from Eeyore in 2 aspect:  
+  - Definitions of local variables may appear at someplace besides the beginning of functions.
+  - Initializations of global variables can appear outside any function.
 
 ## Uniqueness
 Distinct from the designs of my classmates, mine is the so-called "one-pass intermediate code generator" which I believe is exactly the pattern used in the industry.  
@@ -49,8 +55,21 @@ Since I do not need to deal with anything regarding AST(abstract syntax tree), t
 
 ## Ways to Avoid Bugs
 There are mainly 2 ways:  
-  - Building thorough bug reporting and debugging tools.  
+  - Building thorough bug reporting mechanisms and debugging tools.  
   - Lowering complexity as much as possible. (***Occam's Razor***)  
 
 Nearly all of my classmates choose the former; however, I prefer the latter. Just as discussed above, this is the fundamental reason for one-pass scheme.  
-In additions, incremental developing helps a lot. Specifically, by dividing the project into several tasks as shown above and testing each part once finishing, a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-saving.  
+In additions, incremental developing helps a lot. Specifically, by dividing the project into several tasks as shown above and testing each part on finishing, a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-saving.  
+
+## Thoughts of Each Step
+### Step 1 REX & CFG
+Regular expressions are quite easy to write, at least except for multiple-line comments, which can be done by translating a DFA. Maybe the fatal thing is not to leave out "\r".  
+Context free grammars are easy too, although a liiter harder than REX. Modifications of given EBNF is indispensible, which can be done mechanically. Whereas, there is something like associativity that requires further thinking, which may be delayed to latter parts, however.  
+### Step 2 Variable Declarations
+Now we only care about variables other than constants. We do not care about functions parameters and initializations either.  
+Therefore, life is still easy. We only need to set up a stack of symbol tables, which can be easily done with the help of *std::unordered_map* and *std::vector*.  
+### Step 3 Expressions & Statements
+Since we do in a one-pass style, this part is quite easy.
+### Step 4 *if* & *while*
+
+### Step 5 Functions
