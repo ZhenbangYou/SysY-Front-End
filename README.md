@@ -8,7 +8,8 @@ I feel it quite necessary to record my thoughts about the planning and developin
 
 ## Usage
 ```Bash
-git clone 
+git clone https://github.com/ZhenbangYou/SysY-Front-End.git  
+cd SysY-Front-End  
 flex -o lex.yy.cpp source.l  
 bison -d -o source.tab.cpp source.y  
 g++ -Wno-register -O2 -lm -std=c++17 lex.yy.cpp source.tab.cpp -o compiler -Idirs  
