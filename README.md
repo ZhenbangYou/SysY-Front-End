@@ -1,4 +1,4 @@
-# SysY-Front-End: a One-Pass Intermediate Code Generator
+# SysY-Front-End: A One-Pass Intermediate Code Generator
 ## Brief Introduction
 This code generator translates SysY in to Eeyore.  
   - For the definition of SysY, see [here](https://pku-minic.github.io/online-doc/#/sysy/). Basically, it is a subset of C.  
@@ -100,7 +100,7 @@ You may find out that this is not suitable for arrays of constants, as the subsc
 Basically, for arrays of variables, things are just about calculating offsets from subscripts, which can be done by *std::deque*(deque supports pushing and popping from the front, compared with vector). Array definitions and array accesses are mostly the same. Note that the dimension of subscripts can be less than that of the array.
 For arrays of constants, things are just slightly more: we will need to calculate the value when the subscripts are all constants, which can be done by adding a *std::vector* in symbol table entry. In additions, arrays of constants need names.
 ### Step 8 Initializations
-At the beginning, I did not even understand the semantic of intialization lists. In other words, I cannot even accomplish array initializations manually. Thanks to our group members, I finally get through it. The semantic rules are as follows:
+At the beginning, I did not even understand the semantic of initialization lists. In other words, I cannot even accomplish array initializations manually. Thanks to our group members, I finally get through it. The semantic rules are as follows:
   - Each pair of braces is responsible for the initialization of an array, with the outmost one responsible for the entire array.  
   - Every time confronted with a left brace, the dimension of array decrements, while a right brace means an increment.  
   - If there are not enough elements within a pair of braces, the remaining elements are set to 0.  
