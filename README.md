@@ -80,9 +80,9 @@ I admit this is the most difficult and the only difficult part of this project.
 ```
 Cond->{LOrExp.True=NewLabel();} LOrExp {LOrExp.False=NewLabel();print("goto LOrExp.False");}
 LAndExp->EqExp {print("if EqExp.val==0 goto LAndExp.False");}
-| LAndExp_1 && EqExp {print("if EqExp.val==0 goto LAndExp.False");} 
-LOrExp->LAndExp {print("goto LOrExp.True");print("LOrExp.False");}
-| LOrExp_1 || LAndExp {print("goto LOrExp.True");print("LOrExp.False");}
+| {LAndExp_1.False=LAndExp.False;} LAndExp_1 && EqExp {print("if EqExp.val==0 goto LAndExp.False");} 
+LOrExp->{LAndExp.False=NewLabel();} LAndExp {print("goto LOrExp.True");printLabel("LAndExp.False");}
+| {LOrExp_1.True=LOrExp.True;LOrExp_1.False=NewLabel();} LOrExp_1 || LAndExp {print("goto LOrExp.True");print("LOrExp.False");}
 ```              
 ### Step 5 Functions
 Things like how to implement a symbol table for functions are so easy that I have no passion for talking about.  
