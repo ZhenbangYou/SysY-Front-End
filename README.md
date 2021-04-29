@@ -78,11 +78,13 @@ As is known to all, *if* and *while* each need 3 labels.
 The problem is how to implement short circuit by one pass? There are much easier ways to implement it with two passes, which is discussed in page 408, section 6.6.6 of *Dragon Book*.  
 I admit this is the most difficult and the only difficult part of this project.  
 ```
-'(' {$3=new JumpAddr(((IfStmt*)$1)->True,NewLabel());}  Cond ')' {int FalseLabel=((IfStmt*)$1)->False;emit("goto l"+to_string(FalseLabel));} 
+//'(' {$3=new JumpAddr(((IfStmt*)$1)->True,NewLabel());}  Cond ')' {int FalseLabel=((IfStmt*)$1)->False;emit("goto l"+to_string(FalseLabel));} 
+Cond->{Cond.True=NewLabel();LOrExp.True=Cond.True;}LOrExp{Cond.False=NewLabel();print("goto Cond.False");}
 LAndExp       : EqExp {int FalseLabel=((JumpAddr*)$-1)->FalseLabel;emit("if "+((Var*)$1)->getname()+"== 0 goto l"+to_string(FalseLabel));}
               | LAndExp AND{int TrueLabel=((JumpAddr*)$-1)->TrueLabel;int FalseLabel=((JumpAddr*)$-1)->FalseLabel;$2=new JumpAddr(TrueLabel,FalseLabel);} 
                EqExp{int FalseLabel=((JumpAddr*)$-1)->FalseLabel;emit("if "+((Var*)$4)->getname()+"== 0 goto l"+to_string(FalseLabel));}
               ;
+LOrExp->LAndExp
 LOrExp        : LAndExp {int TrueLabel=((JumpAddr*)$-1)->TrueLabel;emit("goto l"+to_string(TrueLabel));emitLabel(((JumpAddr*)$-1)->FalseLabel);}
               | LOrExp OR{int TrueLabel=((JumpAddr*)$-1)->TrueLabel;int FalseLabel=NewLabel();$2=new JumpAddr(TrueLabel,FalseLabel);} 
               LAndExp {int TrueLabel=((JumpAddr*)$2)->TrueLabel;emit("goto l"+to_string(TrueLabel));emitLabel(((JumpAddr*)$2)->FalseLabel);}
