@@ -77,4 +77,6 @@ Since we do in a one-pass style, this part is quite easy.
 
 ### Step 5 Functions
 Things like how to implement a symbol table for functions are so easy that I have no passion for talking about.  
-Parameter counting can be readily done by recording it in the terminal representing parameter list, which greatly shows the flexibility of *void**
+Parameter counting can be readily done by recording it in the terminal representing parameter list, which greatly shows the flexibility of *void\**.  
+Calling functions and getting return values are also easy.  
+But there is still one thing deserving furthur discussing: what if the source code does not have an *return* in some branches?  
