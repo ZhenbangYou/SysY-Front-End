@@ -78,11 +78,11 @@ As is known to all, *if* and *while* each need 3 labels.
 The problem is how to implement short circuit by one pass? There are much easier ways to implement it with two passes, which is discussed in page 408, section 6.6.6 of *Dragon Book*.  
 I admit this is the most difficult and the only difficult part of this project.  
 ```
-Cond->{LOrExp.True=NewLabel();} LOrExp {LOrExp.False=NewLabel();print("goto LOrExp.False");}
-LAndExp->EqExp {print("if EqExp.val==0 goto LAndExp.False");}
-| {LAndExp_1.False=LAndExp.False;} LAndExp_1 && EqExp {print("if EqExp.val==0 goto LAndExp.False");} 
+Cond->{LOrExp.True=Cond.True;} LOrExp {print("goto Cond.False");}
+LAndExp->EqExp {print("ifFalse EqExp goto LAndExp.False");}
+| {LAndExp_1.False=LAndExp.False;} LAndExp_1 && EqExp {print("ifFalse EqExp goto LAndExp.False");}
 LOrExp->{LAndExp.False=NewLabel();} LAndExp {print("goto LOrExp.True");printLabel("LAndExp.False");}
-| {LOrExp_1.True=LOrExp.True;LOrExp_1.False=NewLabel();} LOrExp_1 || LAndExp {print("goto LOrExp.True");print("LOrExp.False");}
+| {LOrExp_1.True=LOrExp.True;} LOrExp_1 || {LAndExp.False=NewLabel();} LAndExp {print("goto LOrExp.True");print("LAndExp.False");}
 ```              
 ### Step 5 Functions
 Things like how to implement a symbol table for functions are so easy that I have no passion for talking about.  
