@@ -77,7 +77,17 @@ Since we do in a one-pass style, this part is quite easy.
 As is known to all, *if* and *while* each need 3 labels.  
 The problem is how to implement short circuit by one pass? There are much easier ways to implement it with two passes, which is discussed in page 408, section 6.6.6 of *Dragon Book*.  
 I admit this is the most difficult and the only difficult part of this project.  
-Let's talk about this more formally. Each short circuit expression is a two-level hierarchy, with the higher level being the result of *||* and the lower level being the result of *&&*. Call everything below the lower level "atom" since it can be work out directly.  
+```
+'(' {$3=new JumpAddr(((IfStmt*)$1)->True,NewLabel());}  Cond ')' {int FalseLabel=((IfStmt*)$1)->False;emit("goto l"+to_string(FalseLabel));} 
+LAndExp       : EqExp {int FalseLabel=((JumpAddr*)$-1)->FalseLabel;emit("if "+((Var*)$1)->getname()+"== 0 goto l"+to_string(FalseLabel));}
+              | LAndExp AND{int TrueLabel=((JumpAddr*)$-1)->TrueLabel;int FalseLabel=((JumpAddr*)$-1)->FalseLabel;$2=new JumpAddr(TrueLabel,FalseLabel);} 
+               EqExp{int FalseLabel=((JumpAddr*)$-1)->FalseLabel;emit("if "+((Var*)$4)->getname()+"== 0 goto l"+to_string(FalseLabel));}
+              ;
+LOrExp        : LAndExp {int TrueLabel=((JumpAddr*)$-1)->TrueLabel;emit("goto l"+to_string(TrueLabel));emitLabel(((JumpAddr*)$-1)->FalseLabel);}
+              | LOrExp OR{int TrueLabel=((JumpAddr*)$-1)->TrueLabel;int FalseLabel=NewLabel();$2=new JumpAddr(TrueLabel,FalseLabel);} 
+              LAndExp {int TrueLabel=((JumpAddr*)$2)->TrueLabel;emit("goto l"+to_string(TrueLabel));emitLabel(((JumpAddr*)$2)->FalseLabel);}
+              ;      
+```              
 ### Step 5 Functions
 Things like how to implement a symbol table for functions are so easy that I have no passion for talking about.  
 Parameter counting can be readily done by recording it in the terminal representing parameter list, which greatly shows the flexibility of *void\**.  
