@@ -9,6 +9,7 @@
 using namespace std;
 #define YYSTYPE void *
 extern FILE* yyin;
+extern FILE* yyout;
 extern int yylex();
 extern int yylineno;
 class WhileLoop;
@@ -102,7 +103,16 @@ public:
         if(is_const&&is_array()==false)
             return to_string(value);
         else if(is_access)
-            return array_name->getname()+"["+offset->getname()+"]";
+        {
+            if(offset->is_const)
+                return array_name->getname()+"["+offset->getname()+"]";
+            else
+            {
+                Var*tmp=new Var();
+                emit(tmp->getname()+" = "+array_name->getname()+" + "+offset->getname());
+                return tmp->getname()+"[0]";
+            }
+        }
         else if(!is_param)
             return "T"+to_string(SeqNo);
         else
@@ -554,15 +564,7 @@ Stmt          : LVal '=' Exp ';'
 
                   emitLabel(((IfStmt*)$1)->True);
               } 
-              Stmt
-              {
-                  emit("goto l"+to_string(((IfStmt*)$1)->After));
-                  emitLabel(((IfStmt*)$1)->False);
-              } 
-              DanglingElse
-              {
-                  emitLabel(((IfStmt*)$1)->After);
-              }
+              Stmt DanglingElse
               | WHILE
               {
                   $1=new WhileLoop(NewLabel(),NewLabel(),NewLabel());
@@ -604,8 +606,15 @@ Stmt          : LVal '=' Exp ';'
               }
               | RETURN ';' {emit("return");}
               ;
-DanglingElse  : ELSE Stmt
-              |
+DanglingElse  : {
+                  emit("goto l"+to_string(((IfStmt*)$-7)->After));
+                  emitLabel(((IfStmt*)$-7)->False);
+                } 
+                ELSE Stmt
+                {
+                  emitLabel(((IfStmt*)$-7)->After);
+                }                
+              | {emitLabel(((IfStmt*)$-7)->False);}
               ;
 
 Exp           : AddExp {$$=$1;}
