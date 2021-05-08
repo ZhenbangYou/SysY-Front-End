@@ -103,16 +103,7 @@ public:
         if(is_const&&is_array()==false)
             return to_string(value);
         else if(is_access)
-        {
-            if(offset->is_const)
-                return array_name->getname()+"["+offset->getname()+"]";
-            else
-            {
-                Var*tmp=new Var();
-                emit(tmp->getname()+" = "+array_name->getname()+" + "+offset->getname());
-                return tmp->getname()+"[0]";
-            }
-        }
+            return array_name->getname()+"["+offset->getname()+"]";
         else if(!is_param)
             return "T"+to_string(SeqNo);
         else
