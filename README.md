@@ -124,6 +124,6 @@ At the beginning, I did not even understand the semantic of initialization lists
 
 As long as you can comprehend the aforementioned rules, implementations will be easy. One assignment is needed for each initialization and one additional recording will be needed if it is a constant.  
 ### Step 9 Instruction Reordering
-Well, it is far too trivial ...  
+Well, it is way too trivial ...  
 ## Acknowledgments
 Thanks to my classmates, group members and roommates, also teaching assistants. Without their help, the design and implementation of this project will surely not be so smooth.  
