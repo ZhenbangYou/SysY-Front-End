@@ -42,6 +42,9 @@ P.S.: One-pass scheme refers to the first 8 steps(step 9 is rather trivial), who
   - Definitions of local variables may appear at someplace besides the beginning of functions.
   - Initializations of global variables can appear outside any function.
 
+## Aside
+**Inherited Attributes** mentioned in this documentation is different from that in the *dragon book*. Mathematically speaking, attributes inherited from siblings are used in this project. However, from the perspective of implementation, this kind of attributes can be implemented in the same way as **synthesized attributes**. Specifically, notations in the form of a dollar followed by a non-positive number such as $-1 will not be used in one of the implementations. This is quite important since notations like $-1 is much trickier to handle correctly.  
+
 ## Uniqueness
 Distinct from the designs of my classmates, mine is the so-called "one-pass intermediate code generator" which I believe is exactly the pattern used in the industry.  
 Every time I talk about my plan to implement a one-pass front end, people tend to question it. Among those questioned I have heard, the most frequently raised two are:   
