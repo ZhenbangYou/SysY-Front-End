@@ -121,7 +121,7 @@ Basically just modify the given *EBNF*, although some regular expressions need t
 As the first step (of step 1), let us deal with the lexer (you can easily obtain confidence in this step. Despite the old proverb that asserts "All things are dificult before they are easy", for this project, the first step is kept as easy as possible (in reality, the following steps will also be arranged in this *easy* style. Trust me and move on!). As mentioned in **Project Files Overview**, the only thing we care about here is **recognizing tokens**, and tokens can be categorized as follows:
   - White space and its equivalents including *\r*, *\t*, *\n*, although these should be ignored by the lexer.
   - Reserved words such as *int*, *const*, *if*, *while*, and etc. They can all be found in the documentation of *SysY*.
-  - Operators consisting of more that one letter, there are 6 of which in total, i.e., *==*, *!=*, *<*, *>*, *<=* and *>=*.
+  - Operators consisting of more that one letter, there are 6 of which in total, i.e., *&&*, *||*, *==*, *!=*, *<=* and *>=*.
   - Identifiers which consists of a English letter or underline and followed by zero or more English letters, underlines or digits.
   - Integer constants that may be decimals, hexadecimals or octonaries.
   - Comments, including single line ones and multiple line ones, which should be treated in the same way as white space.
