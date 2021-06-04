@@ -198,7 +198,7 @@ Now you need a program consisting of merely variable definitions and braces. Var
 #### Reason for the Planning
 There are two reasons:
   - This step is simple, especially in a one-pass scheme.
-  - It can check whether the **symble table stack** works normally, more precisely, whether variable lookups work normally.
+  - It can check whether the **symble table stack** works normally, more precisely, whether variable lookups work normally. Besides, without this part, it would be tough to verify the correctness of **arrays**, since no operation can be performed.
 
 #### Framework
 There are 2 kinds of operations: computations and assignments. Since array have yet to come up, there is nothing to worry about currently.  
@@ -219,6 +219,9 @@ To avoid leaving out adding actions for some production rules, start with the to
 Every operation including parentheses should be involved. Make up expressions as complex as possible. Check whether the associativities and precedences are correct. Also, whether the lookups of variables are correct.  
 
 ### Step 4 *if* & *while*
+#### Reason for the Planning
+Now that there are many alternatives for the current step. In addtion to *if* and *while*, we can deal with **arrays**, **functions** and **constants**. Actually, *if* and *while* are quite independent from the other components. We choose this due to the unique characteristics of *if* and *while*: trickiness and only little code needed. As a result of this, we can verify the correctness of this tricky part when the program is still quite simple. Admittedly, there will not be too many differences if other parts are implemented before this.  
+#### Framework
 As is known to all, *if* and *while* each need 3 labels.  
 The problem is how to implement short circuit by one pass? There are much easier ways to implement it with two passes, which is discussed in page 408, section 6.6.6 of *Dragon Book*.  
 I admit this is the most difficult and the only difficult part of this project.  
