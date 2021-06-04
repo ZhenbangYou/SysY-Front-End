@@ -109,6 +109,9 @@ For each step, I will first present **general ideas and frameworks**, then discu
 Before delving into those steps, keep one thing in mind: since we have carefully considered the order of implementation (i.e., the division of the whole task into steps, and the order of steps), do not think about what you need to do in the future steps when working on the current steps; for instance, when dealing with the definition of variables, never care about constants, as the division and the ordering have guaranteed that everthing can be done step by step smoothly.  
 
 ### Step 1 REX & CFG
+#### Reason for the Planning
+*REX* and *CFG* serve as foundations for this projects, so there is virtually nothing to argue here.  
+
 #### Framework
 Basically just modify the given *EBNF*, although some regular expressions need to be made up by ourselves.  
 
