@@ -180,6 +180,8 @@ The central problem is, what to do when a new variable is created? The answer is
 
 As shown above, parameters are not needed for this kind of variables. Also, we do not need to record the name of variable in its record.  
 
+As for the name appearing in the generated code, you can add a method in the class that is responsible to record the information of variables (*getname* in class *Var* in this project).
+
 One more thing, the documentation of *Eeyore* recommend we use different names to distinguish between named variables and temporary variables. But we choose to merge them for two reasons: first, we want simplicity; second, we can determine whether a record belongs to a temporary variable by check whether it can be found in the **symble table stack**.  
 
 Do not forget to output declarations, as is required in *Eeyore*. This is also the way to verify the correctness.  
@@ -199,9 +201,22 @@ There are two reasons:
   - It can check whether the **symble table stack** works normally, more precisely, whether variable lookups work normally.
 
 #### Framework
-Maybe the only error-prone thing is precedence of operators, which has been solved by the **CFG**. There is nothing more to worry about.  
+There are 2 kinds of operations: computations and assignments. Since array have yet to come up, there is nothing to worry about currently.  
+
+In *Yacc*, each terminal or nonterminal can store something, namely *yylval*. For each terminal, the pointer to the variable associated with it is stored here, which is quite natural. This again shows the flexibility of designating the type of *yylval* as *void*\*.  
+
+For each production rule:
+  - If a computation is involved (production rules like *AddExp -> AddExp + MulExp* in this project), search the **symble table stack** for all source operands, create a new variable for the destination operand and emit an instruction to perform the operation.
+  - If an assignment is involved (*Stmt -> LVal = Exp* in this project), emit an instruction to perform the assignment.
+  - If a left value is turned into an expression (*PrimaryExp -> LVal* in this project), emit an instruction to store the right value of the variable into a new temporary variable.
+  - If a constant is turned into an expression (*Primary -> INT_CONST* in this project), emit an instrution to store the value of the constant into a new temporary variable.
+  - Otherwise (production rules like *AddExp -> MulExp* and *PrimaryExp -> ( Exp )* in this project), just pass the variable pointer of the first and the only terminal at the right side to the symble at the left side.  
 
 #### Detail
+To avoid leaving out adding actions for some production rules, start with the top level production rule (*Stmt -> LVal = Exp* and *Stmt -> Exp* in this project) and search down, like traverse of a tree.  
+
+#### Test Case
+Every operation including parentheses should be involved. Make up expressions as complex as possible. Check whether the associativities and precedences are correct. Also, whether the lookups of variables are correct.  
 
 ### Step 4 *if* & *while*
 As is known to all, *if* and *while* each need 3 labels.  
