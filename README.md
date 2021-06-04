@@ -2,9 +2,12 @@
 
 ## Preface
 This documentations aims to be a intelligible and readable tutorial for everyone who wants to get his or her hands dirty with a real compiler. Admittedly, this is just a toy compiler with evidently poor performance. However, it is due to simplicity and conciseness that this tiny compiler can serve as a material for first step learning.  
+
 Finding either the documentation or code obscure or unintelligible, please inform me of that. The success of this project relies on the readability to a large extent.  
+
 By the way, do not forget to check the prerequisites below, though there are just little of them.  
-**Goal of this documentation**
+
+**Goal of this documentation**  
 Hopefully, anyone meeting the following prerequisites can implement his or her own compiler ***with in three days*** after digesting this documentation (even without reading the code of this project!). If you could not, that would all be my own responsiblity and thus I would update this documentation until my promise would be realized.  
 
 ## Prerequisite
@@ -34,6 +37,7 @@ You may replace *parser.y* with *parser_without_inherited_attributes.y*
 
 ## Principles
 Seminal principle: Avoiding Bugs through Simplicity  
+
 Important principles: Modularization, Regularization and Building Incrementally
 
 ## Aside
@@ -49,12 +53,16 @@ Every time I talk about my plan to implement a one-pass front end, people tend t
 
 **Why one-pass?**  
 *Simplicity.*  
+
 Since I do not need to deal with anything regarding AST(abstract syntax tree), the length of my code is just about a half of that of my classmates'.  
+
 *Shorter code, less bugs.*  
+
 In addition, since I can output code intermediately, I can easily check the correctness of each part once it is done.  
 
 **Contributution**
 This is the first one-pass code generator in this semester. What's more, to the best of my knowledge, those who also implement their compilers in this way are all deeply affected by this project, either encouraged by the success of this project or inspired by the design scheme adopted by this project. One of the classmate told me that, since the feasibility and simplicity of the one-pass scheme had been convincingly proved by this project, he was so confident about this scheme that he finally implement in this way and also achived fairly high developing efficiency.  
+
 You may ask about how to verify the feasibility, given that this is exactly the first work. The answer is, actually, quite simple: by mathamatics. Specifically, the toughest part of verification lies in those requiring *inherited attributes*. However, as shown in the aside in *chapter 5.5.4* of *Dragon Book*, **all L-attributed SDD on an LL grammar can be adapted to an equivalent SDD on an LR grammar**, which absolutely solve the problem raised above.  
 
 ## Ways to Avoid Bugs
@@ -63,7 +71,17 @@ There are mainly 2 ways:
   - Lowering complexity as much as possible. (***Occam's Razor***)  
 
 Nearly all of my classmates choose the former; however, I prefer the latter. Just as discussed above, this is the fundamental reason for one-pass scheme.  
+
 In addition, incremental developing helps a lot. Specifically, by dividing the project into several tasks as shown above and testing each part on finishing (by virtue of one-pass scheme), a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-saving.  
+
+## Project Files Overview
+This project consists of only 2 files:
+  - a *Lexer*, namely *lexer.l*, written in *Lex*, responsible for recognizing **tokens** (and ignore white space and equivalent).
+  - a *Parser*, namely *parser.y*, written in *Yacc*, responsible for everything else, including the **SDT** (core of this project) and class definitions such as a variable table.
+
+As you have seen, the lexer is kept as simple as possible (thus consisting of just about a half hundred lines of code). In sharp contrast to this, the parser accomplishes everything else; therefore, you will find about a thousand lines of code in the parser.  
+
+Adding the aforementioned lines above, it is easily seen that the whole project can be finished with just about a thousand lines of code or slightly more (if not less), which is ***less than half*** of the code length of common design scheme (a great bliss for those weak at coding!).  
 
 ## Planning
 Divided in to 9 steps.
@@ -86,17 +104,52 @@ P.S.: One-pass scheme refers to the first 8 steps(step 9 is rather trivial), who
   - Initializations of global variables can appear outside any function.
 
 ## Thoughts of Each Step
-For each step, I will first present **general ideas and frameworks**, then discuss some **impletation details and pitfalls**, and finally I will also present **test cases** in accordance with all the frameworks and details mentioned above (as a result, you no longer need any test cases provided by others!).  
+For each step, I will first present **general ideas and frameworks**, then discuss some **impletation details and pitfalls**, and finally I will also present **test cases** in accordance with all the frameworks and details mentioned above (as a result, you no longer need any test cases provided by others!). Plus, the reason for the **planing** (i.e., what exactly should be done next and what should be done in the future) will be discussed at the beginning of each step. All in all, you will find 4 sub-steps in each step.  
+
+Before delving into those steps, keep one thing in mind: since we have carefully considered the order of implementation (i.e., the division of the whole task into steps, and the order of steps), do not think about what you need to do in the future steps when working on the current steps; for instance, when dealing with the definition of variables, never care about constants, as the division and the ordering have guaranteed that everthing can be done step by step smoothly.  
+
 ### Step 1 REX & CFG
 #### Framework
 Basically just modify the given *EBNF*, although some regular expressions need to be made up by ourselves.  
+
+As the first step (of step 1), let us deal with the lexer (you can easily obtain confidence in this step. Despite the old proverb that asserts "All things are dificult before they are easy", for this project, the first step is kept as easy as possible (in reality, the following steps will also be arranged in this *easy* style. Trust me and move on!). As mentioned in **Project Files Overview**, the only thing we care about here is **recognizing tokens**, and tokens can be categorized as follows:
+  - White space and its equivalents including *\r*, *\t*, *\n*, although these should be ignored by the lexer.
+  - Reserved words such as *int*, *const*, *if*, *while*, and etc. They can all be found in the documentation of *SysY*.
+  - Operators consisting of more that one letter, there are 6 of which in total, i.e., *==*, *!=*, *<*, *>*, *<=* and *>=*.
+  - Identifiers which consists of a English letter or underline and followed by zero or more English letters, underlines or digits.
+  - Integer constants that may be decimals, hexadecimals or octonaries.
+  - Comments, including single line ones and multiple line ones, which should be treated in the same way as white space.
+  - Other one-letter tokens.
+
+Note that the order aboved should not be changed arbitrarily, for *Lex* always tries to match the pattern that comes first.
+  
+Now pay attention to the **CFG**. Mathematically speaking, **CFG** and **EBNF** are equivalent, and they are quite similar. Inspired by this, we can copy the *EBNF* given in the documentation of *SysY* and make some necessary modifications, among which the most important things are translating those *parentheses*, *square brackets* and *braces*. The translation of first two of these three are straightforward, whereas the last one is somewhat trickier----the translation of this component involves associativity. Granted, figuring out associativities of all rules in this step is hard and unnecessary, and we may make *lazy* adjustments later (that is, when needed). For the time being, you only need to determine the associativity where it is designated by the **semantic**.
+
 #### Detail
-Regular expressions are quite easy to write, at least except for multiple-line comments, which can be done by translating a DFA. Maybe the fatal thing is not to leave out "\r".  
-Context free grammars are easy too, although a little harder than REX. Modifications of given EBNF are indispensable, which can be done mechanically. Whereas, there is something like associativity that requires further thinking, which may be delayed to latter parts, however.  
-The most important things of this step are the following two:  
-  - Type of *yylval*, namely *YYSTYPE*. For flexibility, I choose *void**.  
-  - What to store in *yylval*. My lexer just does the minimum: for identifier, store itself; for number, store the integer value it represents.  
+The most critical implementation details of the **lexer** is what it should pass to the **parser**, namely the **interface** between them. Specifically, what we should decide here is the type of *yylval* (i.e., what *YYSTYPE* should be defined as. If you do not understand what is being talked about, please refer to the manual *Lex and Yacc* as soon as possible), what should be stored in this variable (one for each token!), and what should be returned by the *lexer* (a integer value, as mandated by *Lex*). Let us examine each kind of tokens separately as follows:
+  - White space and its equivalents. Just ignore them.
+  - Reserved words. Return the corresponding token (these should be defined in the **parser**; after that, compiler the *Yacc* file with choice *-d* and you will get a *.tab.hpp* file. For more details about this procedure, refer to *Lex and Yacc*).
+  - Operators consisting of more that one letter. The same as reserved words.
+  - Identifiers. Return a token representing *identifier*. *yylval* needs to store a string representing the name of the identifier (note that we do not need to store the string in *yylval* itself; instead, *yylval* only need to provide a means to find the string. This also applies to the next category).
+  - Integer constants. Return a token representing integer constant. *yylval* needs to store the value of the constant. For the sake of different systems (namely decimal, hexadecimal and octonary), *%i* in *scanf* is strongly recommended, since it can deal with this nuisance for you.
+  - Comments. The only REX that is non-trivial appears here----multiple line comments. As a simple way to crack this, you can write its *DFA* then transform the *DFA* into *REX*. This should also be ignored.
+  - Other one-letter tokens. Just return itself. No need to manipulate *yylval*.
+
+As a brief summary, the type of *yylval* should be set as *void*\* for the sake of flexibility (those necessary *new* operations should be figured out by yourself!). Note that *union* in *C++* does not support *constructors*.
+
+By the way, add a dummy *yywrap* function that always return **1** in the lexer.  
+
+In addtion, for error reporting in the future, include *yylineno* in the **lexer**. The usage of *yylineno* can be found in *Lex and Yacc* or online. The correctness of line number should also be tested here. 
+
+For **CFG**, not so much to discuss here.  
+
 #### Test case
+For the **lexer**, you may add a temporary *main* function in the *Lex* file to test the correctness of the lexer in isolation. Every time a token is recognized, you can print out the return value of *yylex* and the information tracked by *yylval*. Every legal *SysY* program can be a test case and complicated ones are preferred here. That is, try to include all kinds of tokens in one program.
+
+For **CFG**, the only thing we can test here is whether it will report *syntax error* when encountering a legal program (and vice versa).  
+
+Note that there will be a **shift/reduce conflict**, namely the renowned **dangling else**. If more conflicts are reported, there must be bugs.  
+
 ### Step 2 Variable Declarations
 Now we only care about variables other than constants. We do not care about functions parameters and initializations either.  
 Therefore, life is still easy. We only need to set up a stack of symbol tables, which can be easily done with the help of *std::unordered_map* and *std::vector*.  
