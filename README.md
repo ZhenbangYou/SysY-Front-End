@@ -72,7 +72,10 @@ There are mainly 2 ways:
 
 Nearly all of my classmates choose the former; however, I prefer the latter. Just as discussed above, this is the fundamental reason for one-pass scheme.  
 
-In addition, incremental developing helps a lot. Specifically, by dividing the project into several tasks as shown above and testing each part on finishing (by virtue of one-pass scheme), a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-saving.  
+In addition, **incremental developing** helps a lot. Specifically, by dividing the project into several tasks as shown above and testing each part on finishing (by virtue of one-pass scheme), a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-saving.  
+
+**How to find bugs**
+By checking generated code.  
 
 ## Project Files Overview
 This project consists of only 2 files:
@@ -146,7 +149,7 @@ In addtion, for error reporting in the future, include *yylineno* in the **lexer
 
 For **CFG**, not so much to discuss here.  
 
-#### Test case
+#### Test Case
 For the **lexer**, you may add a temporary *main* function in the *Lex* file to test the correctness of the lexer in isolation. Every time a token is recognized, you can print out the return value of *yylex* and the information tracked by *yylval*. Every legal *SysY* program can be a test case and complicated ones are preferred here. That is, try to include all kinds of tokens in one program.
 
 For **CFG**, the only thing we can test here is whether it will report *syntax error* when encountering a legal program (and vice versa).  
@@ -154,10 +157,52 @@ For **CFG**, the only thing we can test here is whether it will report *syntax e
 Note that there will be a **shift/reduce conflict**, namely the renowned **dangling else**. If more conflicts are reported, there must be bugs.  
 
 ### Step 2 Variable Declarations
-Now we only care about variables other than constants. We do not care about functions parameters and initializations either.  
-Therefore, life is still easy. We only need to set up a stack of symbol tables, which can be easily done with the help of *std::unordered_map* and *std::vector*.  
+#### Reason for the Planning
+Now that we have both **lexer** and **CFG**, variable declarations are the startpoint of everything else.  
+
+It should be made clear that we only deal with scalar variables here; that is, other than constants, parameters or arrays; besides, we do not care about initializations.  
+
+#### Framework
+First, there should be a data structure to record necessary information about each variable (class *Var* in this project). At present, since there are just scalar variables, the only thing we need to record is the unique sequence number for each variable (surely there should be more information recorded, but according to our developing principles we just care about this single field, i.e., *SeqNo* in this project). The data structure for **a single variable** is done.  
+
+Second, let consider how to assemble variables into data structures. At the moment, let us go without scopes. Scopes form a hierachy, so let us get rid of scopes and think about the situation where every variable is a global variable. Now comes the central problem: how to find the corresponding variable with its unique name? The answer is rather simple: with a hash table (*unordered_map* in *C++*), where variable names serve as keys and pointers to the data structures that record information about variables (exactly that described in the last paragraph) serve as values. Now the so-called "**symble table**" (class *Env* in this project) is done, which is the data structure for **variables within the same scope**.  
+
+Third, let us take the aforementioned hierachy into account. As is known to all (that have basic knowledge about *C/C++*), at any point of a program, live scopes forms a total order. In other words, taking any two live scopes *A* and *B*, one of the following two must hold true: *A* is subset of *B*, or *B* is subset of *A*. Therefore, scopes can be organized into a stack, each of whose element is a symble table; when a new scope come into being, a new symble table will be pushed into the stack; when a scope ends, the top element of the stack will be popped out. Finally, the data structure for **all variables** (field *top* in class *Parser* in this project) is formed (let us call it **symble table stack**).  
+
+#### Details
+In fact, many details have been discussed in the **Framework**. However, there are also some details left.  
+
+The central problem is, what to do when a new variable is created? The answer is as follows:  
+  - Check the top of **symble table stack**. If variable with the same name already exists, an error will be caught.
+  - Create a record for this variable .I n this project, variable creation is done directly by constructors. Thus, with variable type growing (constants, parameters and etc), there are more and more constructors, leading to confusion. Since in order to distinguish constructors, different parameter lists are needed, which is quite hard to remember. As a consequence, I recommend you add one method for each type of variable and implement the method as a wrapper of the same constructor, e.g., method called *new_var* can be added here. As you see, in this way, different parameter lists are no longer needed and a much readable name can be used.
+  - Determine the sequence number. This can be done by adding a *static* field (*count* in class *Var* in this project).
+  - Insert the record into the top of **symble table stack**.
+
+As shown above, parameters are not needed for this kind of variables. Also, we do not need to record the name of variable in its record.  
+
+One more thing, the documentation of *Eeyore* recommend we use different names to distinguish between named variables and temporary variables. But we choose to merge them for two reasons: first, we want simplicity; second, we can determine whether a record belongs to a temporary variable by check whether it can be found in the **symble table stack**.  
+
+Do not forget to output declarations, as is required in *Eeyore*. This is also the way to verify the correctness.  
+
+Indents are highly recommended, as it helps a lot for determining whether variables are assigned to correct scopes.  
+
+Let us talk a bit more about the way to output. For debugging and redirection, **do not use *cout* directlt**. In instead, you are recommend to write a wrapper function (*emit* in this project) so that all the output should go through this function, thereby adjusting the way to output easily. At present, you can represent the indent with a *string* consisting of *\t* and adjust the number of *\t* when the **symble table stack** is pushed or popped.  
+
+#### Test Case
+
+Now you need a program consisting of merely variable definitions and braces. Variables in different scopes can have the same name. Besides, check whether your compiler will throw an error when a variable is redefined, and whether the line number is correct in the error report. A single program with no more than 5 scopes in total suffices.
+
 ### Step 3 Expressions & Statements
-Since we do in a one-pass style, this part is quite easy.
+#### Reason for the Planning
+There are two reasons:
+  - This step is simple, especially in a one-pass scheme.
+  - It can check whether the **symble table stack** works normally, more precisely, whether variable lookups work normally.
+
+#### Framework
+Maybe the only error-prone thing is precedence of operators, which has been solved by the **CFG**. There is nothing more to worry about.  
+
+#### Detail
+
 ### Step 4 *if* & *while*
 As is known to all, *if* and *while* each need 3 labels.  
 The problem is how to implement short circuit by one pass? There are much easier ways to implement it with two passes, which is discussed in page 408, section 6.6.6 of *Dragon Book*.  
