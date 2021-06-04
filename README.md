@@ -36,26 +36,6 @@ You may replace *parser.y* with *parser_without_inherited_attributes.y*
 Seminal principle: Avoiding Bugs through Simplicity  
 Important principles: Modularization, Regularization and Building Incrementally
 
-## Planning
-Divided in to 9 steps.
-|Step|Task(s)|Core|
-|:---|:---|:---|
-|1|REX & CFG|Modifying EBNF|
-|2|Variable Declarations|Scope|
-|3|Expressions & Statements|(Easy)|
-|4|*if* & *while*|Short Circuit|
-|5|Functions|(Easy)|
-|6|Constants|Value Recording|
-|7|Arrays|Offset & Constant Elements|
-|8|Initialization|Understanding the Semantic|
-|9|Instruction Reordering|(Trivial)|
-
-There is only one difficult part, namely step 4.  
-
-P.S.: One-pass scheme refers to the first 8 steps(step 9 is rather trivial), whose output is different from Eeyore in 2 aspect:  
-  - Definitions of local variables may appear at someplace besides the beginning of functions.
-  - Initializations of global variables can appear outside any function.
-
 ## Aside
 **Inherited Attributes** mentioned in this documentation is different from that in the *dragon book*. Mathematically speaking, attributes inherited from siblings are used in this project. However, from the perspective of implementation, this kind of attributes can be implemented in the same way as **synthesized attributes**. Specifically, notations in the form of a dollar followed by a non-positive number such as $-1 will not be used in one of the implementations. This is quite important since notations like $-1 is much trickier to handle correctly.  
 
@@ -85,14 +65,38 @@ There are mainly 2 ways:
 Nearly all of my classmates choose the former; however, I prefer the latter. Just as discussed above, this is the fundamental reason for one-pass scheme.  
 In addition, incremental developing helps a lot. Specifically, by dividing the project into several tasks as shown above and testing each part on finishing (by virtue of one-pass scheme), a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-saving.  
 
+## Planning
+Divided in to 9 steps.
+|Step|Task(s)|Core|
+|:---|:---|:---|
+|1|REX & CFG|Modifying EBNF|
+|2|Variable Declarations|Scope|
+|3|Expressions & Statements|(Easy)|
+|4|*if* & *while*|Short Circuit|
+|5|Functions|(Easy)|
+|6|Constants|Value Recording|
+|7|Arrays|Offset & Constant Elements|
+|8|Initialization|Understanding the Semantic|
+|9|Instruction Reordering|(Trivial)|
+
+There is only one difficult part, namely step 4.  
+
+P.S.: One-pass scheme refers to the first 8 steps(step 9 is rather trivial), whose output is different from Eeyore in 2 aspect:  
+  - Definitions of local variables may appear at someplace besides the beginning of functions.
+  - Initializations of global variables can appear outside any function.
+
 ## Thoughts of Each Step
 For each step, I will first present **general ideas and frameworks**, then discuss some **impletation details and pitfalls**, and finally I will also present **test cases** in accordance with all the frameworks and details mentioned above (as a result, you no longer need any test cases provided by others!).  
 ### Step 1 REX & CFG
+#### Framework
+Basically just modify the given *EBNF*, although some regular expressions need to be made up by ourselves.  
+#### Detail
 Regular expressions are quite easy to write, at least except for multiple-line comments, which can be done by translating a DFA. Maybe the fatal thing is not to leave out "\r".  
 Context free grammars are easy too, although a little harder than REX. Modifications of given EBNF are indispensable, which can be done mechanically. Whereas, there is something like associativity that requires further thinking, which may be delayed to latter parts, however.  
 The most important things of this step are the following two:  
   - Type of *yylval*, namely *YYSTYPE*. For flexibility, I choose *void**.  
   - What to store in *yylval*. My lexer just does the minimum: for identifier, store itself; for number, store the integer value it represents.  
+#### Test case
 ### Step 2 Variable Declarations
 Now we only care about variables other than constants. We do not care about functions parameters and initializations either.  
 Therefore, life is still easy. We only need to set up a stack of symbol tables, which can be easily done with the help of *std::unordered_map* and *std::vector*.  
