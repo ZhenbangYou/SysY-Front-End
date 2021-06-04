@@ -86,7 +86,7 @@ Nearly all of my classmates choose the former; however, I prefer the latter. Jus
 In addition, incremental developing helps a lot. Specifically, by dividing the project into several tasks as shown above and testing each part on finishing (by virtue of one-pass scheme), a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-saving.  
 
 ## Thoughts of Each Step
-For each step, I will first present **general ideas and framework**, then discuss some **impletation details and pitfalls**, and finally I will also present **test cases** in accordance with all the frameworks and details mentioned above (as a result, you no longer need any test cases provided by others!).  
+For each step, I will first present **general ideas and frameworks**, then discuss some **impletation details and pitfalls**, and finally I will also present **test cases** in accordance with all the frameworks and details mentioned above (as a result, you no longer need any test cases provided by others!).  
 ### Step 1 REX & CFG
 Regular expressions are quite easy to write, at least except for multiple-line comments, which can be done by translating a DFA. Maybe the fatal thing is not to leave out "\r".  
 Context free grammars are easy too, although a little harder than REX. Modifications of given EBNF are indispensable, which can be done mechanically. Whereas, there is something like associativity that requires further thinking, which may be delayed to latter parts, however.  
