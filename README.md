@@ -359,14 +359,38 @@ Cond ->
 {LOrExp.True = Cond.True;} LOrExp {Cond.False = NewLabel(); print("goto Cond.False");}
 
 LOrExp -> 
-                                           {LAndExp.False=NewLabel();} LAndExp {print("goto LOrExp.True"); printLabel("LAndExp.False");}
-| {LOrExp_1.True = LOrExp.True;} LOrExp_1 || {LAndExp.False=NewLabel();} LAndExp {print("goto LOrExp.True"); printLabel("LAndExp.False");}
+{LAndExp.False=NewLabel();} LAndExp {print("goto LOrExp.True"); printLabel("LAndExp.False");}
+|
+{LOrExp_1.True = LOrExp.True;} LOrExp_1 || 
+{LAndExp.False=NewLabel();} LAndExp {print("goto LOrExp.True"); printLabel("LAndExp.False");}
 
 LAndExp -> 
-                                                  Atom {print("if Atom == 0 goto LAndExp.False");}
-| {LAndExp_1.False = LAndExp.False;} LAndExp_1 && Atom {print("if Atom == 0 goto LAndExp.False");}
+Atom {print("if Atom == 0 goto LAndExp.False");}
+| 
+{LAndExp_1.False = LAndExp.False;} LAndExp_1 && 
+Atom {print("if Atom == 0 goto LAndExp.False");}
 ```
-As an instance for this SDT, I will show the reducing process of ```Atom_00 && Atom_01 || Atom_10 && Atom_11``` (the third time we have talked about this example!) as follows:  
+As an instance for this SDT, I will show the reducing process of ```Atom_00 && Atom_01 || Atom_10 && Atom_11``` (the third time we have talked about this example!).  
+
+The reducing process without actions is as follows:  
+```
+Atom_00 && Atom_01 || Atom_10 && Atom_11
+=>
+LAndExp_00 && Atom_01 || Atom_10 && Atom_11
+=>
+LAndExp_0 || Atom_10 && Atom_11
+=>
+LOrExp_0 || Atom_10 && Atom_11
+=>
+LOrExp_0 || LAndExp_10 && Atom_11
+=>
+LOrExp_0 || LAndExp_1
+=>
+LOrExp
+=>
+Cond
+```
+The reducing process with actions is as follows:
 ||Symbols|Input|Actions|Comments|
 |:---|:---|:---|:---|:---|
 |1|(Cond.true, unknown)|Atom_00 && Atom_01 \|\| Atom_10 && Atom_11|Reduce by M -> {LOrExp_0.true = Cond.true}|Although LOrExp_0 has yet to be seen, the LR parser knows that there must be one|
