@@ -225,7 +225,7 @@ Generally spearking, this step consists of 4 parts:
   - Short circuit expressions
   - *break* and *continue*
 
-##### Short Circuit Expreesion
+##### Short Circuit Expression
 
 Owing to the difficulty and centrality of the second part, namely **short circuit expression**, our discussion starts here.  
 
@@ -235,7 +235,7 @@ Each **short circuit expressions** can be formalized as a hierachy and I will li
   - Logical "*or*" expressions (abbreviated as *LOrExp*, the same name is used in this project) like *Atom_00 && Atom_01 || Atom_10 && Atom_11*.
   - The whole short circuit expression itself (*Cond* in this project, the same name will be used in this documentation later) that is directly used as a whole in the pair of parentheses following *if* and *while*.
 
-Below, I will refer to each of the hierachy as **component**.  
+Below, I will refer to each of the hierachy as a **component**.  
 
 Now the central problem is, how to obtain labels (i.e., target jump addresses) and where to emit *goto* instructions.  
 
