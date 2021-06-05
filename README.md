@@ -52,7 +52,7 @@ Every time I talk about my plan to implement a one-pass front end, people tend t
 **Why one-pass?**  
 *Simplicity.*  
 
-Since I do not need to deal with anything regarding AST(abstract syntax tree), the length of my code is less than half of that of my classmates'.  
+Since I do not need to deal with anything regarding AST (abstract syntax tree), the length of my code is less than half of that of my classmates'.  
 
 *Shorter code, less bugs.*  
 
@@ -61,7 +61,7 @@ In addition, since I can output code intermediately, I can easily check the corr
 **Contribution**  
 This is the first one-pass code generator in this semester. What's more, to the best of my knowledge, those who also implement their compilers in this way are all deeply affected by this project, either encouraged by the success of this project or inspired by the design scheme adopted by this project. One of the classmates told me that, since the feasibility and simplicity of the one-pass scheme had been convincingly proved by this project, he was so confident about this scheme that he finally implement in this way and also achieved fairly high developing efficiency.  
 
-You may ask about how to verify the feasibility, given that this is exactly the first work. The answer is, actually, quite simple: by mathematics. Specifically, the toughest part of verification lies in those requiring *inherited attributes*. However, as shown in the aside in *chapter 5.5.4* of *Dragon Book*, **an L-attributed SDD on an LL grammar can be adapted to an equivalent SDD on an LR grammar**, which absolutely solve the problem raised above.  
+You may ask about how to verify the feasibility, given that this is exactly the first work. The answer is, actually, quite simple: by mathematics. Specifically, the toughest part of verification lies in those requiring *inherited attributes*. However, as is shown in the aside in *chapter 5.5.4* of *Dragon Book*, **an L-attributed SDD on an LL grammar can be adapted to an equivalent SDD on an LR grammar**, which absolutely solve the problem raised above.  
 
 **Aside**  
 **Inherited Attributes** mentioned in this documentation is different from that in the *dragon book*. Admittedly, attributes inherited from siblings are used in this project. However, from the perspective of implementation, this kind of attributes can be implemented in the same way as **synthesized attributes**. Specifically, notations in the form of a dollar followed by a non-positive number such as $-1 will not be used in one of the implementations. This is quite important since notations like $-1 is much trickier to handle correctly.  
@@ -73,7 +73,7 @@ There are mainly 2 ways:
 
 Nearly all of my classmates choose the former; however, I prefer the latter. Just as is discussed above, this is the fundamental reason for the one-pass scheme.  
 
-In addition, **incremental developing** helps a lot. Specifically, by dividing the project into several steps as shown below and testing each part on finishing (by virtue of the one-pass scheme), a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-effective.  
+In addition, **incremental developing** helps a lot. Specifically, by dividing the project into several steps as is shown below and testing each part on finishing (by virtue of the one-pass scheme), a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-effective.  
 
 **How to debug**
 Bugs are not formidable, as long as they are restricted in limited area and can be easily fixed. This is exactly the wonderful characteristic of this design!  
@@ -91,7 +91,7 @@ As you have seen, the lexer is kept as simple as possible (thus consisting of ju
 
 Generally speaking, this project is build revolving the **CFG**. Deal with separate parts in different steps, thus achieving high degree of decoupling and modularity.  
 
-As a short summary, the whole project can be finished with just about a thousand lines of code or slightly more (if not less), which is ***less than half*** of the code length of common design scheme (a great bliss for those weak at coding!).  
+As a short summary, the whole project can be finished with just about a thousand lines of code or slightly more (if not less), which is ***less than half*** of the code length of common design scheme (a great bliss for anyone weak at coding!).  
 
 ## Planning
 Divided in to 9 steps.
@@ -317,7 +317,7 @@ For each component, when a label is needed, there are only 2 ways to obtain it:
   - generate by itself.
   - inherit from others.
 
-Also, as shown in the above example, one label may be shared by more than one components. That being said, only one of them generate the label, others just inherit it. Therefore, the core of the scheme is:
+Also, as is shown in the above example, one label may be shared by more than one components. That being said, only one of them generate the label, others just inherit it. Therefore, the core of the scheme is:
   - who is responsible for generating the label?
   - from whom does a component inherit the label?
 
@@ -337,7 +337,7 @@ the first label needed is the false label of LAndExp_0, when ```Atom_0``` is red
 
 True labels of ```LOrExp``` can be handled in a similar way. This can be an exercise for yourself (although the complete SDT will be presented later, please think about it now, since this is really interesting)!  
 
-When the component of the highest level, namely ```Cond```, is created via reduction, its true label has been specified (generated by the ```LorExp``` reduced from a single ```LAndExp```) and should serve as the true entry of an *if* statement or the entry of a *while* loop that specifies the begin of its body, while its false label has yet to be specified (the way to generate and inherit this label varies).  
+When the component of the highest level, namely ```Cond```, is created via reduction, its true label has been specified (generated by the ```LOrExp``` reduced from a single ```LAndExp```) and should serve as the true entry of an *if* statement or the entry of a *while* loop that specifies the begin of its body, while its false label has yet to be specified (the way to generate and inherit this label varies).  
 
 As you have seen, this scheme can be implemented without **inherited attributed**. In other words, all attributes are either synthesized or inherited from siblings. The complete SDT is as follows:  
 ```
@@ -638,7 +638,7 @@ Complete procedures are summarized as follows (suppose we are to initialize an a
   - 1. Compute the array that specifies how many elements should be initialized in this pair of braces. Let us call this array ```NumEle```.
   - 2. Set the pointer to ```NumEle``` as -1. Set the pointer to the current element that is being initialized to 0. Let us call them ```ptr_num``` and ```cur_pos``` respectively.
   - 3. When an element in the intialization list is encountered, intialize ```arr[cur_pos]``` with it, and let ```cur_pos = cur_pos + 1```. When a left brace is encoutered, let ```ptr_num = ptr_num + 1```. When a right brace is encountered, if the right brace directly follows a left brace (that is, this list is empty), initialize all the element as 0 (```NumEle[ptr_num]``` elements in total); else, intialize all the remaining elements to 0 (the termination condition can be ```cur_pos % NumEle[ptr_num] == 0```); finally, let ```ptr_num = ptr_num - 1``` in both cases.
-  - 4. Repeat 3.
+  - 4. Repeat iii.
 
 #### Test Case
 You should try different types of initialization lists. Typically, an array with no more than 4 dimensions suffices. Both variable and constant arrays should be tried.  
