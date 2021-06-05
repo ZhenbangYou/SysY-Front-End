@@ -163,9 +163,9 @@ Now that we have both **lexer** and **CFG**, variable declarations are the start
 It should be made clear that we only deal with scalar variables here; that is, other than constants, parameters or arrays; besides, we do not care about initializations.  
 
 #### Framework
-First, there should be a data structure to record necessary information about each variable (class *Var* in this project). At present, since there are just scalar variables, the only thing we need to record is the unique sequence number for each variable (surely there should be more information recorded, but according to our developing principles we just care about this single field, i.e., *SeqNo* in this project). The data structure for **a single variable** is done.  
+First, there should be a data structure to record necessary information about each variable (class *Var* in this project. I will call it **variable record** below). At present, since there are just scalar variables, the only thing we need to record is the unique sequence number for each variable (surely there should be more information recorded, but according to our developing principles we just care about this single field, i.e., *SeqNo* in this project). The data structure for **a single variable** is done.  
 
-Second, let consider how to assemble variables into data structures. At the moment, let us go without scopes. Scopes form a hierachy, so let us get rid of scopes and think about the situation where every variable is a global variable. Now comes the central problem: how to find the corresponding variable with its unique name? The answer is rather simple: with a hash table (*unordered_map* in *C++*), where variable names serve as keys and pointers to the data structures that record information about variables (exactly that described in the last paragraph) serve as values. Now the so-called "**symble table**" (class *Env* in this project) is done, which is the data structure for **variables within the same scope**.  
+Second, let consider how to assemble variables into data structures. At the moment, let us go without scopes. Scopes form a hierachy, so let us get rid of scopes and think about the situation where every variable is a global variable. Now comes the central problem: how to find the corresponding variable with its unique name? The answer is rather simple: with a hash table (*unordered_map* in *C++*), where variable names serve as keys and pointers to **variable records** serve as values. Now the so-called "**symble table**" (class *Env* in this project) is done, which is the data structure for **variables within the same scope**.  
 
 Third, let us take the aforementioned hierachy into account. As is known to all (that have basic knowledge about *C/C++*), at any point of a program, live scopes forms a total order. In other words, taking any two live scopes *A* and *B*, one of the following two must hold true: *A* is subset of *B*, or *B* is subset of *A*. Therefore, scopes can be organized into a stack, each of whose element is a symble table; when a new scope come into being, a new symble table will be pushed into the stack; when a scope ends, the top element of the stack will be popped out. Finally, the data structure for **all variables** (field *top* in class *Parser* in this project) is formed (let us call it **symble table stack**).  
 
@@ -174,15 +174,15 @@ In fact, many details have been discussed in the **Framework**. However, there a
 
 The central problem is, what to do when a new variable is created? The answer is as follows:  
   - Check the top of **symble table stack**. If variable with the same name already exists, an error will be caught.
-  - Create a record for this variable .I n this project, variable creation is done directly by constructors. Thus, with variable type growing (constants, parameters and etc), there are more and more constructors, leading to confusion. Since in order to distinguish constructors, different parameter lists are needed, which is quite hard to remember. As a consequence, I recommend you add one method for each type of variable and implement the method as a wrapper of the same constructor, e.g., method called *new_var* can be added here. As you see, in this way, different parameter lists are no longer needed and a much readable name can be used.
+  - Create a **variable record** for this variable .I n this project, variable creation is done directly by constructors. Thus, with variable type growing (constants, parameters and etc), there are more and more constructors, leading to confusion. Since in order to distinguish constructors, different parameter lists are needed, which is quite hard to remember. As a consequence, I recommend you add one method for each type of variable and implement the method as a wrapper of the same constructor, e.g., method called *new_var* can be added here. As you see, in this way, different parameter lists are no longer needed and a much readable name can be used.
   - Determine the sequence number. This can be done by adding a *static* field (*count* in class *Var* in this project).
-  - Insert the record into the top of **symble table stack**.
+  - Insert the **variable record** into the top of **symble table stack**.
 
-As shown above, parameters are not needed for this kind of variables. Also, we do not need to record the name of variable in its record.  
+As shown above, parameters are not needed for this kind of variables. Also, we do not need to record the name of variable in its **variable record**.  
 
-As for the name appearing in the generated code, you can add a method in the class that is responsible to record the information of variables (*getname* in class *Var* in this project).
+As for the name appearing in the generated code, you can add a method in the **variable record** that returns the name of the variable (*getname* in class *Var* in this project).
 
-One more thing, the documentation of *Eeyore* recommend we use different names to distinguish between named variables and temporary variables. But we choose to merge them for two reasons: first, we want simplicity; second, we can determine whether a record belongs to a temporary variable by check whether it can be found in the **symble table stack**.  
+One more thing, the documentation of *Eeyore* recommend we use different names to distinguish between named variables and temporary variables. But we choose to merge them for two reasons: first, we want simplicity; second, we can determine whether a **variable record** belongs to a temporary variable by check whether it can be found in the **symble table stack**.  
 
 Do not forget to output declarations, as is required in *Eeyore*. This is also the way to verify the correctness.  
 
@@ -426,15 +426,70 @@ Let me say a few more words about this. As you may have realized, the difficulit
 ##### Everything Else about the Framework
 After **short circuit expression**, there are no obstacles any more in terms of the front end.  
 
+*SysY* code in the form of ```if(Cond) S_1 else S_2``` should be translated into
+```
+Cond
+True:
+S_1
+goto After
+False:
+S_2
+After:
+```
+where Cond.true=True and Cond.false=False.  
 
+*SysY* code in the form of ```while(Cond) S``` should be translated into
+```
+Begin:
+Cond
+Body:
+S
+goto Begin 
+After:
+```
+where Cond.true=Body and Cond.false=After.  
+
+As shown above, either *if* or *while* needs 3 labels. When to generate these labels depens on the translation scheme of the **short circuit expression**:
+  - For the **bottom-up** scheme, *Cond.true* is generated within the translation process of *Cond*.
+  - For the **top-down** scheme, *Cond.true* and *Cond.false* are both needed during the translation process of *Cond*, so these 2 labels should be generated before *Cond*.
+
+As for *break* and *continue*, you need to know the nearest *while* loop, this can be done by maintaining a stack (*while_stack* in class *Parser* in this project) to record the nesting of *while* loop. Thus *break* means ```goto stack.top().After``` while *continue* means ```goto stack.top().Begin```.  
+
+Relation expressions are too similar to arithmetic expressions discussed in **Step 3** to be discussed here again.
+
+#### Details
+For the **short circuit expression**, you should find somewhere to store those jump addresses. Just like arithmetic expressions store the variable representing results in the *yylval* of symbols, jump addresses can be stored in  
+  - *yylval* of terminals, for the **bottom-up** scheme, e.g., store LAndExp.false within LAndExp itself.
+  - *yylval* of nonterminals, for the **top-down** scheme. More precisely, store the jump address of a terminal in the *yylval* of the nonterminal just below it in the stack, e.g., for ```LAndExp_1 && LAndExp_2```, store LAndExp_2.false within the nonterminal *&&*.  
+
+For *if* statement, the scheme discussed in the **framework** always generate a ```goto After``` instruction regardless of whether there is *else*, thus leading to a wasteful *goto*. There is a simple remedy: delay the emission of ```goto After``` until the keyword *else* is seen.  
+
+For relation expression, pay attention to a corner case like ```if(x)``` since ```if x goto L``` is illegal in *Eeyore*; instead, you should emit ```if x == 0 goto L```. For uniformity, you can solve every relation expression into a single variable (namely *Atom* mentioned in the **short circuit expression**), and then always use instructions like ```if x == 0 goto L```.  
+
+#### Test Case
+For the **short circuit expression**, expressions like ```Atom_00 && Atom_01 || Atom_10 && Atom_11``` suffice, since longer ones do not bring more complexity.  
+
+For relation expressions, like expressions in **Step 3**, make up an expression that involve all operators.  
+
+Finally, make up some *if* statements and *while* loops and make them nested. Do not forget to add enough *break* and *continue*.  
+
+Once again, a single program is sufficient for the test. However, this time, reading the output of your compiler becomes much harder due to labels and *goto*.  
 
 ### Step 5 Functions
-Things like how to implement a symbol table for functions are so easy that I have no passion for talking about.  
-Parameter counting can be readily done by recording it in the non-terminal representing parameter list, which greatly shows the flexibility of *void\**.  
-Calling functions and getting return values are also easy.  
-But there is still one thing deserving further discussing: what if the source code does not have a *return* in some branches?  
-One of my classmates asserted that he can perform checking in every branch. This sounds radical but I believe this is impossible.  
-Practically speaking, just add a *return* before the end of each function (recall Occam's razor).
+#### Framework
+From the perspective of callee, there are 3 things to be handled:  
+  - registration of function name.
+  - registration of parameters.
+  - returning values.
+
+From the perspective of caller, there are also 3 things to be handled (and they are corresponding to the three above):
+  - lookup of function name (to check whether this function has been defined).
+  - parameter passing.
+  - obtaining return values.
+
+Registration and lookup of function name can be done by a hash table, just like **symble table**.  
+
+For the registration of parameters, a new method is needed for the **variable record**, and one parameter is needed for this method to show how many parameters of this function have been registered.  
 ### Step 6 Constants
 I create an entry in symbol table for each constant, but I do not create a temporary variable for it. That being said, I emit the value of the constant every time I am confronted with it. Plus, every time an operation is performed, I check whether all the source operands are constants; if they are, the destination operand will also be a constant, thus no temporary variable being created.  
 You may find out that this is not suitable for arrays of constants, as the subscripts can be variables. This is true. Nonetheless, based on my principles, I choose to delay it until I need to deal with arrays.  
