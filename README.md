@@ -8,12 +8,12 @@ Finding either the documentation or code obscure or unintelligible, please conta
 By the way, do not forget to check the prerequisites below, though there are just little of them.  
 
 **Goal of this documentation**  
-Hopefully, anyone meeting the following prerequisites can implement his or her own compiler ***within three days*** after digesting this documentation (even without reading the code of this project!). If you could not, that would all be my own responsiblity and thus I would update this documentation until my promise could be realized.  
+Hopefully, anyone meeting the following prerequisites can implement his or her own compiler ***within three days*** after digesting this documentation (even without reading the code of this project!). If you could not, that would all be my own responsibility and thus I would update this documentation until my promise could be realized.  
 
 ## Prerequisite
 - Basic knowledge about **compilers**.  
 - For mathematical foundations, definitions of **regular expression (REX)** and **context free grammar (CFG)** are suggested. In-depth comprehension is not mandatory; instead, this serves no use in terms of developing a compiler with the help of *Lex* and *Yacc*.  
-- As you may have thought about, familarity with **Lex** and **Yacc** is indispensable. If you do not, a manual called *Lex and Yacc (2nd Edition)* will be highly recommended; only the first 3 chapters are required, but it would be better if you could also master the usage of **inherited attributes** which is in chap7.  
+- As you may have thought about, familiarity with **Lex** and **Yacc** is indispensable. If you do not, a manual called *Lex and Yacc (2nd Edition)* will be highly recommended; only the first 3 chapters are required, but it would be better if you could also master the usage of **inherited attributes** which is in chap7.  
 - For a better understanding about the code and *SysY*, you are suggested to know basic *C/C++* grammar.
 
 ## Brief Introduction
@@ -58,13 +58,13 @@ Since I do not need to deal with anything regarding AST(abstract syntax tree), t
 
 In addition, since I can output code intermediately, I can easily check the correctness of each part once it is done.  
 
-**Contributution**  
-This is the first one-pass code generator in this semester. What's more, to the best of my knowledge, those who also implement their compilers in this way are all deeply affected by this project, either encouraged by the success of this project or inspired by the design scheme adopted by this project. One of the classmate told me that, since the feasibility and simplicity of the one-pass scheme had been convincingly proved by this project, he was so confident about this scheme that he finally implement in this way and also achived fairly high developing efficiency.  
+**Contribution**  
+This is the first one-pass code generator in this semester. What's more, to the best of my knowledge, those who also implement their compilers in this way are all deeply affected by this project, either encouraged by the success of this project or inspired by the design scheme adopted by this project. One of the classmates told me that, since the feasibility and simplicity of the one-pass scheme had been convincingly proved by this project, he was so confident about this scheme that he finally implement in this way and also achieved fairly high developing efficiency.  
 
-You may ask about how to verify the feasibility, given that this is exactly the first work. The answer is, actually, quite simple: by mathamatics. Specifically, the toughest part of verification lies in those requiring *inherited attributes*. However, as shown in the aside in *chapter 5.5.4* of *Dragon Book*, **an L-attributed SDD on an LL grammar can be adapted to an equivalent SDD on an LR grammar**, which absolutely solve the problem raised above.  
+You may ask about how to verify the feasibility, given that this is exactly the first work. The answer is, actually, quite simple: by mathematics. Specifically, the toughest part of verification lies in those requiring *inherited attributes*. However, as shown in the aside in *chapter 5.5.4* of *Dragon Book*, **an L-attributed SDD on an LL grammar can be adapted to an equivalent SDD on an LR grammar**, which absolutely solve the problem raised above.  
 
 **Aside**  
-**Inherited Attributes** mentioned in this documentation is different from that in the *dragon book*. Admiitedly, attributes inherited from siblings are used in this project. However, from the perspective of implementation, this kind of attributes can be implemented in the same way as **synthesized attributes**. Specifically, notations in the form of a dollar followed by a non-positive number such as $-1 will not be used in one of the implementations. This is quite important since notations like $-1 is much trickier to handle correctly.  
+**Inherited Attributes** mentioned in this documentation is different from that in the *dragon book*. Admittedly, attributes inherited from siblings are used in this project. However, from the perspective of implementation, this kind of attributes can be implemented in the same way as **synthesized attributes**. Specifically, notations in the form of a dollar followed by a non-positive number such as $-1 will not be used in one of the implementations. This is quite important since notations like $-1 is much trickier to handle correctly.  
 
 ## Ways to Avoid Bugs
 There are mainly 2 ways:  
@@ -109,46 +109,46 @@ Divided in to 9 steps.
 
 There is only one difficult part, namely step 4.  
 
-P.S.: The one-pass scheme refers to the first 8 steps(step 9 is rather trivial), whose output is different from *Eeyore* in 2 aspects:  
+P.S.: The one-pass scheme refers to the first 8 steps (step 9 is rather trivial), whose output is different from *Eeyore* in 2 aspects:  
   - Definitions of local variables may appear anywhere instead of only the beginning of functions.
   - Initializations of global variables appear outside any function.
 
-The output of the first 8 step is called *pre_Eeyore*, since it is quite silimar to *Eeyore* and can be generated in the one-pass style.  
+The output of the first 8 step is called *pre_Eeyore*, since it is quite similar to *Eeyore* and can be generated in the one-pass style.  
 
 ## How to Get Started
-I have been always hearing students saying that, "I am not good at programming, I am not familiar with compiler design and I am not able to figure out all the details of such a hugh project. How can I ever conquer the *Monster* of the complexity of compiler design?"  
+I have been always hearing students saying that, "I am not good at programming, I am not familiar with compiler design and I am not able to figure out all the details of such a huge project. How can I ever conquer the *Monster* of the complexity of compiler design?"  
 
 My answer always come in the following way:  
   - Get your hands dirty with some trivial parts, no matter how trivial it is. In my design, **Step 1,2 and 3** are all quite simple. However, they can really help you procure confidence! Indeed, once you finish the **short circuit expression**, there will no longer be any essential obstruction.
   - Although you do need to consider the general framework before getting started, it is both unnecessary and impossible to get every detail clear. In reality, it suffices to prove the feasibility mathematically. Besides, the feasibility has been proved by this project practically. Why not just have a try?
 
 ## Thoughts of Each Step
-For each step, I will first present **general ideas and frameworks**, then discuss some **impletation details and pitfalls**, and finally I will also talk about how to construct **test cases** in accordance with all the frameworks and details mentioned above (as a result, you no longer need any test cases provided by others!). Plus, the reason for the **planing** (i.e., what exactly should be done next and what should be done in the future) will be discussed at the beginning of each step. All in all, you will find 4 sub-steps in each step. If any part does not appear, that must be because there is nothing to say about it. 
+For each step, I will first present **general ideas and frameworks**, then discuss some **implementation details and pitfalls**, and finally I will also talk about how to construct **test cases** in accordance with all the frameworks and details mentioned above (as a result, you no longer need any test cases provided by others!). Plus, the reason for the **planning** (i.e., what exactly should be done next and what should be done in the future) will be discussed at the beginning of each step. All in all, you will find 4 sub-steps in each step. If any part does not appear, that must be because there is nothing to say about it. 
 
-Before delving into those steps, keep one thing in mind: since we have carefully considered the order of implementation (i.e., the division of the whole task into steps, and the order of steps), do not think about what you need to do in the future steps when working on the current steps; for instance, when dealing with the declarations of variables, never care about constants, as the division and the ordering have guaranteed that everthing can be done step by step smoothly.  
+Before delving into those steps, keep one thing in mind: since we have carefully considered the order of implementation (i.e., the division of the whole task into steps, and the order of steps), do not think about what you need to do in the future steps when working on the current steps; for instance, when dealing with the declarations of variables, never care about constants, as the division and the ordering have guaranteed that everything can be done step by step smoothly.  
 
 ### Step 1 REX & CFG
 #### Framework
 Basically just modify the given *EBNF*, although some regular expressions need to be made up by ourselves.  
 
-As the first step (of step 1), let us deal with the lexer (you can easily obtain confidence in this step. Despite the old proverb that asserts "All things are dificult before they are easy", for this project, the first step is kept as easy as possible, in reality, the following steps will also be arranged in this *easy* style. Trust me and move on!). As mentioned in **Project Files Overview**, the only thing we care about here is **recognizing tokens**, and tokens can be categorized as follows:
+As the first step (of step 1), let us deal with the lexer (you can easily obtain confidence in this step. Despite the old proverb that asserts "All things are difficult before they are easy", for this project, the first step is kept as easy as possible, in reality, the following steps will also be arranged in this *easy* style. Trust me and move on!). As mentioned in **Project Files Overview**, the only thing we care about here is **recognizing tokens**, and tokens can be categorized as follows:
   - White space and its equivalents including *\r*, *\t*, *\n*, although these should be ignored by the lexer.
-  - Reserved words such as *int*, *const*, *if*, *while*, and etc, which can all be found in the documentation of *SysY*.
-  - Operators consisting of more that one letter, there are 6 of which in total, i.e., *&&*, *||*, *==*, *!=*, *<=* and *>=*.
-  - Identifiers which consists of a English letter or underline and followed by zero or more English letters, underlines or digits.
+  - Reserved words such as *int*, *const*, *if*, *while* and etc., which can all be found in the documentation of *SysY*.
+  - Operators consisting of more than one letters, there are 6 of which in total, i.e., *&&*, *||*, *==*, *!=*, *<=* and *>=*.
+  - Identifiers which consist of a English letter or underline and followed by zero or more English letters, underlines or digits.
   - Integer constants that may be decimals, hexadecimals or octonaries.
   - Comments, including single line ones and multiple line ones, which should be treated in the same way as white space.
   - Other one-letter tokens.
 
-Note that the order aboved should not be changed arbitrarily, for *Lex* always tries to match the pattern that comes first.
+Note that the above order should not be changed arbitrarily, for *Lex* always tries to match the pattern that comes first.
   
-Now pay attention to the **CFG**. Mathematically speaking, **CFG** and **EBNF** are equivalent, and they are quite similar. Inspired by this, we can copy the *EBNF* given in the documentation of *SysY* and make some necessary modifications, among which the most important things are translating those *parentheses*, *square brackets* and *braces*. The translation of first two are straightforward, whereas the last one is somewhat trickier----it involves associativity. Granted, figuring out associativities of all rules in this step is hard and unnecessary, and we may make *lazy* adjustments later (that is, when needed; also making this kind of adjustments is simple). For the time being, you only need to determine the associativity where it is designated by the **semantic**.
+Now pay attention to the **CFG**. Mathematically speaking, **CFG** and **EBNF** are equivalent, and they are quite similar. Inspired by this, we can copy the *EBNF* given in the documentation of *SysY* and make some necessary modifications, among which the most important things are translating those *parentheses*, *square brackets* and *braces*. The translation of first two are straightforward, whereas the last one is somewhat trickier----it involves associativity. Granted, figuring out associativity of all rules in this step is hard and unnecessary, and we may make *lazy* adjustments later (that is, when needed; also making this kind of adjustments is simple). For the time being, you only need to determine the associativity where it is designated by the **semantic**.
 
 #### Detail
 The most critical implementation details of the **lexer** is what it should pass to the **parser**, namely the **interface** between them. Specifically, what we should decide here is the type of *yylval* (i.e., what *YYSTYPE* should be defined as. If you do not understand what is being talked about, please refer to the manual *Lex and Yacc* as soon as possible), what should be stored in this variable (one for each symbol!), and what should be returned by the *lexer* (a integer value, as mandated by *Lex*). Let us examine each kind of tokens separately as follows:
   - White space and its equivalents. Just ignore them.
   - Reserved words. Return the corresponding token (these should be defined in the **parser**; after that, compiler the *Yacc* file with choice *-d* and you will get a *.tab.hpp* file. For more details about this procedure, refer to *Lex and Yacc*).
-  - Operators consisting of more that one letter. The same as reserved words.
+  - Operators consisting of more than one letters. The same as reserved words.
   - Identifiers. Return a token representing an *identifier*. *yylval* needs to store a string representing the name of the identifier (note that we do not need to store the string in *yylval* itself; instead, *yylval* only need to provide a means to find the string. This also applies to the next category).
   - Integer constants. Return a token representing an integer constant. *yylval* needs to store the value of the constant. For the sake of different systems (namely decimal, hexadecimal and octonary), *%i* in *scanf* is strongly recommended, since it can deal with this nuisance for you.
   - Comments. The only REX that is non-trivial appears here----multiple line comments. As a simple way to crack this, you can write its *DFA* (hint: the minimal *DFA* contains 5 states) and then transform the *DFA* into *REX*. This should also be ignored.
@@ -158,7 +158,7 @@ As a brief summary, the type of *yylval* should be set as *void*\* for the sake 
 
 By the way, add a dummy *yywrap* function that always return **1** in the lexer.  
 
-In addtion, for error reporting in the future, include *yylineno* in the **lexer**. The usage of *yylineno* can be found in *Lex and Yacc* or online.  
+In addition, for error reporting in the future, include *yylineno* in the **lexer**. The usage of *yylineno* can be found in *Lex and Yacc* or online.  
 
 For **CFG**, not so much to discuss here.  
 
@@ -177,24 +177,24 @@ It should be made clear that we only deal with scalar variables here; that is, o
 
 First, there should be a data structure to record necessary information about each variable (class *Var* in this project. I will call it **variable record** below). At present, since there are just scalar variables, the only thing we need to record is the unique sequence number for each variable (surely there should be more information recorded, but according to our developing principles we just care about this single field, i.e., *SeqNo* in this project). The data structure for **a single variable** is done.  
 
-Second, let consider how to assemble variables into data structures. At the moment, let us go without scopes. Scopes form a hierachy, so let us get rid of scopes and think about the situation where every variable is a global variable. Now comes the central problem: how to find the corresponding variable with its unique name? The answer is rather simple: with a hash table (*unordered_map* in *C++*), where variable names serve as keys and pointers to **variable records** serve as values. Now the so-called **symble table** (class *Env* in this project) is done, which is the data structure for **variables within the same scope**.  
+Second, let consider how to assemble variables into data structures. At the moment, let us go without scopes. Scopes form a hierarchy, so let us get rid of scopes and think about the situation where every variable is a global variable. Now comes the central problem: how to find the corresponding variable with its unique name? The answer is rather simple: with a hash table (*unordered_map* in *C++*), where variable names serve as keys and pointers to **variable records** serve as values. Now the so-called **symbol table** (class *Env* in this project) is done, which is the data structure for **variables within the same scope**.  
 
-Third, let us take the aforementioned hierachy into account. As is known to all (that have basic knowledge about *C/C++*), at any point of a program, live scopes form a total order. In other words, taking any two live scopes *A* and *B*, one of the following two must hold true: 
+Third, let us take the aforementioned hierarchy into account. As is known to all (that have basic knowledge about *C/C++*), at any point of a program, live scopes form a total order. In other words, taking any two live scopes *A* and *B*, one of the following two must hold true: 
   - *A* is subset of *B*.
   - *B* is subset of *A*.
 
-Therefore, scopes can be organized as a stack, each of whose element is a **symble table**; when a new scope come into being, a new **symble table** should be pushed into the stack; when a scope ends, the top element of the stack should be popped out. Finally, the data structure for **all variables** (field *top* in class *Parser* in this project) is formed (let us call it **symble table stack**).  
+Therefore, scopes can be organized as a stack, each of whose element is a **symbol table**; when a new scope come into being, a new **symbol table** should be pushed into the stack; when a scope ends, the top element of the stack should be popped out. Finally, the data structure for **all variables** (field *top* in class *Parser* in this project) is formed (let us call it **symbol table stack**).  
 
-In addition, the daclarations of a series of variables within the same statement should be performed from the left to the right, as a variable can be intialized with the value of the variable that is declared at the left within the same statement. For example, ```int a = 0, b = a;``` is legal.  
+In addition, the declarations of a series of variables within the same statement should be performed from the left to the right, as a variable can be initialized with the value of the variable that is declared at the left within the same statement. For example, ```int a = 0, b = a;``` is legal.  
 
 #### Details
 In fact, many details have been discussed in the **Framework**. However, there are also some details left.  
 
 The central problem is, what to do when a new variable is created? The answer is as follows:  
-  - Check the top of **symble table stack**. If variable with the same name already exists, an error will be caught.
-  - Create a **variable record** for this variable .In this project, variable creation is done directly by constructors. Thus, with variable type growing (constants, parameters and etc), there are more and more constructors, leading to confusion. Since in order to distinguish constructors, different parameter lists are needed, which is quite hard to remember. Therefore, I recommend you add one method for each type of variable and implement the method as a wrapper of the constructor, e.g., method called *new_var* can be added here. As you see, in this way, different parameter lists are no longer needed and a more readable name can be used.
+  - Check the top of **symbol table stack**. If variable with the same name already exists, an error will be caught.
+  - Create a **variable record** for this variable. In this project, variable creation is done directly by constructors. Thus, with variable type growing (constants, parameters and etc.), there are more and more constructors, leading to confusion. Since in order to distinguish constructors, different parameter lists are needed, which is quite hard to remember. Therefore, I recommend you add one method for each type of variable and implement the method as a wrapper of the constructor, e.g., method called *new_var* can be added here. As you see, in this way, different parameter lists are no longer needed and a more readable name can be used.
   - Determine the sequence number, which can be done by adding a *static* field (*count* in class *Var* in this project).
-  - Insert the **variable record** into the top of **symble table stack**.
+  - Insert the **variable record** into the top of **symbol table stack**.
 
 As is shown above, parameters are not needed for this kind of variables. Also, we do not need to record the name of variable in its **variable record**.  
 
@@ -202,13 +202,13 @@ As for the name appearing in the generated code, you can add a method in the **v
 
 One more thing, the documentation of *Eeyore* recommend we use different names to distinguish between named variables and temporary variables. But we choose to merge them for two reasons: 
   - simplicity.
-  - we can determine whether a **variable record** belongs to a temporary variable by looking it up in the **symble table stack**.  
+  - we can determine whether a **variable record** belongs to a temporary variable by looking it up in the **symbol table stack**.  
 
 Do not forget to output declarations, as is required in *Eeyore*. This is also a way to verify the correctness.  
 
 Indents are highly recommended, as it helps a lot for determining whether variables are assigned to correct scopes.  
 
-Let us talk a bit more about the way to output. For debugging and redirection, **do not use *cout* directly**. Instead, you are recommend to write a wrapper function (*emit* in this project) so that all the output are forced go through this function, thereby adjusting the way to output easily. At present, you can represent the indent with a *string* consisting of *\t* and adjust the number of *\t* when the **symble table stack** is pushed or popped.  
+Let us talk a bit more about the way to output. For debugging and redirection, **do not use *cout* directly**. Instead, you are recommended to write a wrapper function (*emit* in this project) so that all the output are forced go through this function, thereby adjusting the way to output easily. At present, you can represent the indent with a *string* consisting of *\t* and adjust the number of *\t* when the **symbol table stack** is pushed or popped.  
 
 #### Test Case
 
@@ -218,7 +218,7 @@ Now you need a program consisting of merely variable definitions and braces. Var
 #### Reason for the Planning
 There are two reasons:
   - This step is simple, especially in a one-pass scheme.
-  - It can check whether the **symble table stack** works normally, more precisely, whether variable lookups work normally. Besides, without this part, it would be tough to verify the correctness of **arrays**, since no operation can be performed.
+  - It can check whether the **symbol table stack** works normally, more precisely, whether variable lookups work normally. Besides, without this part, it would be tough to verify the correctness of **arrays**, since no operation can be performed.
 
 #### Framework
 There are 2 kinds of operations: computations and assignments. Since arrays have yet to come up, there is nothing to worry about currently.  
@@ -226,26 +226,26 @@ There are 2 kinds of operations: computations and assignments. Since arrays have
 In *Yacc*, each terminal or nonterminal can store something, namely *yylval*. For each terminal, the pointer to the variable associated with it is stored here, which is quite natural. This again shows the flexibility of designating the type of *yylval* as *void*\*.  
 
 For each production rule:
-  - If a computation is involved (production rules like ```AddExp -> AddExp + MulExp``` in this project), search the **symble table stack** for all source operands, create a new variable for the destination operand and emit an instruction to perform the operation.
+  - If a computation is involved (production rules like ```AddExp -> AddExp + MulExp``` in this project), search the **symbol table stack** for all source operands, create a new variable for the destination operand and emit an instruction to perform the operation.
   - If an assignment is involved (```Stmt -> LVal = Exp``` in this project), emit an instruction to perform the assignment.
   - If a left value is turned into an expression (```PrimaryExp -> LVal``` in this project), emit an instruction to store the right value of the variable into a new temporary variable.
-  - If a constant is turned into an expression (```Primary -> INT_CONST``` in this project), emit an instrution to store the value of the constant into a new temporary variable.
-  - Otherwise (production rules like ```AddExp -> MulExp``` and ```PrimaryExp -> ( Exp )``` in this project), just pass the variable pointer of the first and the only terminal at the right side to the symble at the left side.  
+  - If a constant is turned into an expression (```Primary -> INT_CONST``` in this project), emit an instruction to store the value of the constant into a new temporary variable.
+  - Otherwise (production rules like ```AddExp -> MulExp``` and ```PrimaryExp -> ( Exp )``` in this project), just pass the variable pointer of the first and the only terminal at the right side to the symbol at the left side.  
 
 #### Detail
-To avoid leaving out adding actions for some production rules, start with the top level production rules (```Stmt -> LVal = Exp``` and ```Stmt -> Exp``` in this project) and search down, like traverse of a tree.  
+To avoid leaving out adding actions for some production rules, start with the top-level production rules (```Stmt -> LVal = Exp``` and ```Stmt -> Exp``` in this project) and search down, like traverse of a tree.  
 
 #### Test Case
-Every operation including parentheses should be involved. Make up expressions as complex as possible. Check whether the associativities and precedences are correct. Also, whether the lookups of variables are correct.  
+Every operation including parentheses should be involved. Make up expressions as complex as possible. Check whether the associativity and precedence are correct. Also, whether the lookups of variables are correct.  
 
 Although we have not dealt with functions yet, you still need to write expressions in *main*; otherwise, *Yacc* will throw an error. Keep in mind that, although we have not finished yet (that is to say, correct *Eeyore* code cannot be produced completely), syntax errors will still be found by *Yacc* as long as your **CFG** is correct.  
 
 ### Step 4 *if* & *while*
 #### Reason for the Planning
-Now that there are many alternatives for the current step. In addtion to *if* and *while*, we can deal with **arrays**, **functions** and **constants**. Actually, *if* and *while* are quite independent from the other components. We choose this due to the unique characteristics of *if* and *while*: trickiness and only little code needed. As a result of this, we can verify the correctness of this tricky part when the program is still quite simple. Admittedly, there will not be too many differences if other parts are implemented before this.  
+Now that there are many alternatives for the current step. In addition to *if* and *while*, we can deal with **arrays**, **functions** and **constants**. Actually, *if* and *while* are quite independent from the other components. We choose this due to the unique characteristics of *if* and *while*: trickiness and only little code needed. As a result of this, we can verify the correctness of this tricky part when the program is still quite simple. Admittedly, there will not be too many differences if other parts are implemented before this.  
 
 #### Framework
-Generally spearking, this step consists of 4 parts:  
+Generally speaking, this step consists of 4 parts:  
   - *if* statement and *while* loop themselves
   - Relation expressions like *A == B* and *A < B*
   - Short circuit expressions
@@ -255,13 +255,13 @@ Generally spearking, this step consists of 4 parts:
 
 Owing to the difficulty and centrality of the second part, namely **short circuit expression**, our discussion starts here. Also, after the discussion of this subsection, you will find that starting from this part can help you come up with a simpler scheme!  
 
-Each **short circuit expressions** can be formalized as a hierachy and I will list them below following a **bottom-up** order (the same as the LR parser):  
+Each **short circuit expressions** can be formalized as a hierarchy and I will list them below following a **bottom-up** order (the same as the LR parser):  
   - Atom (*EqExp* in this project), namely an expression whose value (may be determined at runtime or compilation time) can be store into a single variable.
   - Logical "*and*" expressions (abbreviated as *LAndExp*, the same name is used in this project) like ```Atom_0 && Atom_1```.
   - Logical "*or*" expressions (abbreviated as *LOrExp*, the same name is used in this project) like ```Atom_00 && Atom_01 || Atom_10 && Atom_11```.
   - The whole short circuit expression itself (*Cond* in this project, the same name will be used in this documentation later) that is directly used as a whole in the pair of parentheses following *if* and *while*.
 
-Below, I will refer to each of the hierachy as a **component**.  
+Below, I will refer to each of the hierarchy as a **component**.  
 
 Now the central problem is, how to obtain labels (i.e., target jump addresses) and where to emit ```goto``` instructions.  
 
@@ -441,7 +441,7 @@ The reducing process with actions is as follows:
 |24|(Cond.true, Cond.false), LOrExp||Reduce by Cond -> LOrExp||
 |25|(Cond.true, Cond.false), Cond||Done!||
 
-Eventually, our discussion about the *formidable* **short circuit expression** has come to an end! This part does requite a lot of thinking and intelligence! The organization and narration of this part also require careful consideration and exemplification. Obviously, the **bottom-up** scheme is easier to come up with and implement. However, the first scheme that came up first to me is indeed the tougher and more complex one, presumably because my first design in this step started from *if* and *while* rather than the **short circuit expression**. As a brief summary, since *Yacc* analyzes the program in a **bottom-up** style, keeping thinking in the same style turns out to be the better way (obviously, *Cond* lies in the *bottom* of *if* and *while*). However, since the nature of human goes in the reverse way, the greatest obstacle lies in the cooperation between human brain and the math.
+Eventually, our discussion about the *formidable* **short circuit expression** has come to an end! This part does require a lot of thinking and intelligence! The organization and narration of this part also require careful consideration and exemplification. Obviously, the **bottom-up** scheme is easier to come up with and implement. However, the first scheme that came up first to me is indeed the tougher and more complex one, presumably because my first design in this step started from *if* and *while* rather than the **short circuit expression**. As a brief summary, since *Yacc* analyzes the program in a **bottom-up** style, keeping thinking in the same style turns out to be the better way (obviously, *Cond* lies in the *bottom* of *if* and *while*). However, since the nature of human goes in the reverse way, the greatest obstacle lies in the cooperation between human brain and the math.
 
 All in all, the difficulties of the design of these schemes lie in the so-called **reverse thinking**. Although you may crack this part with a hybrid method (two-pass here, one-pass elsewhere) or backpatching, this one-pass scheme is really elegant and requires very little code. Awesome!  
 
@@ -512,9 +512,9 @@ From the perspective of caller, there are also 3 things to be handled (and they 
   - parameter passing.
   - obtaining return values.
 
-Registration and lookup of function name can be done by a hash table, just like the **symble table**.  
+Registration and lookup of function name can be done by a hash table, just like the **symbol table**.  
 
-For the registration of parameters, a new method is needed for the **variable record**, and one parameter is needed for this method to show how many parameters of this function have been registered. Although the order of counting is **irrelevant** to the correctness of produced code, by the convetion, I count from the left. The order of counting is determined by associativity of the production rule.  
+For the registration of parameters, a new method is needed for the **variable record**, and one parameter is needed for this method to show how many parameters of this function have been registered. Although the order of counting is **irrelevant** to the correctness of produced code, by the convention, I count from the left. The order of counting is determined by associativity of the production rule.  
 
 Besides, since the name of a parameter and the name of a variable defined in the outmost scope of same function cannot be the same, we need to add an extra **symbol table** for parameters, whose scope lies just outside outmost scope of the function. Every time a new variable is declared, you should check whether the second last element of the **symbol table stack** is a **symbol table** of parameters and if yes, whether that name has been occupied by certain parameter.  
 
@@ -522,7 +522,7 @@ Parameter passing is quite error-prone. Think about the following example:
 ```
 f(0, g(1))
 ```
-A incorrect scheme (adopted by many students) works as follows:
+An incorrect scheme (adopted by many students) works as follows:
   - When 0 is read, emit ```param 0```.
   - When 1 is read, emit ```param 1```.
   - Call ```g``` and put the return value as the second parameter.
@@ -534,7 +534,7 @@ In contrast, the correct procedures are as follows:
   - When a parameter is read and solved (like ```g(1)```, the solving of parameters may be necessary sometimes), put it into a list (can be implemented by *vector* in *C++*).
   - When all parameters are read and solved, put them into correct positions one by one.
 
-Within the callee, sometimes there is no such instruction as ```return```. Meanwhile, sometimes it is also impossible to analyze all the possible control flow to determine whether there is at least one ```return``` instructions in each path. As a result, a simple and also the only practical way is to add an extra ```return``` instruction right before the the end of each function.  
+Within the callee, sometimes there is no such instruction as ```return```. Meanwhile, sometimes it is also impossible to analyze all the possible control flow to determine whether there is at least one ```return``` instructions in each path. As a result, a simple and also the only practical way is to add an extra ```return``` instruction right before the end of each function.  
 
 For the caller, obtaining return value is straightforward----just by an equal sign ("="). As a one-pass code generator does not know whether this return value will be used later, it will always get the return value as long as there is one. From a standpoint of assembly language, no matter used or not, the return value always resides there (*a0* for RISC-V 32I and *%rax* for x86).  
 
@@ -549,7 +549,7 @@ Finally, check whether the return value can be used by the caller correctly.
 
 ### Step 6 Constants
 #### Reason for the Planning
-Without correct handling of constants, arrrays and intialzations cannot be handled.  
+Without correct handling of constants, arrays and initialzations cannot be handled.  
 
 #### Framework
 Two new field is needed for the **variable record**:  
@@ -562,7 +562,7 @@ Next, we need to identify all the constants, following the rules below:
   - the terminal ```INT_CONST``` specifies a constant.
   - if all the source operands are constants, then the destination operand will also be a constant.
 
-As you may have found, scalar constant do not need to be declared, and operations with source operand being all constants do not involve an instruction.  
+As you may have found, scalar constants do not need to be declared, and operations with source operand being all constants do not involve an instruction.  
 
 #### Details
 Identification of constants can be adhered to the handling of expressions. Again, start from the highest level to avoid omission.  
@@ -596,8 +596,8 @@ For example, if the array is ```a[3][4]```, then the *deque* containing its subs
 Besides, the following fields should be added to the **variable record**:
   - a boolean field specifying whether being an array.
   - a *deque* field holding the values of elements for constant arrays.
-  - two pointers to variable records to accomodate an array access (as an array access can appear as a left value in the left hand side of an assignment, a **variable record** ought to be able to represent an array access which involves another two **variable records**).
-  - a boolean field specifying whether being an array access can be added **for convinience**, which is **not mandatory**.
+  - two pointers to variable records to accommodate an array access (as an array access can appear as a left value in the left-hand side of an assignment, a **variable record** ought to be able to represent an array access which involves another two **variable records**).
+  - a boolean field specifying whether being an array access can be added **for convenience**, which is **not mandatory**.
 
 Thus two new methods are needed to add new **variable record**, one for arrays and the other for array accesses.  
 
@@ -612,11 +612,11 @@ Let us make a brief summary about methods needed in the **variable record** in o
 Do not forget to declare a constant array since the subscripts can be variables.  
 
 #### Test Case
-Both arrays and indices can be variables or constants, and your program should cover all of these cases. Also, the dimension of the indices can be equal to or less than that of the array, with the latter case appearing in the parameter of functions. A *main* function and a function called with several types of real parameters (in terms of whether being an array, a constant and etc) suffice.  
+Both arrays and indices can be variables or constants, and your program should cover all of these cases. Also, the dimension of the indices can be equal to or less than that of the array, with the latter case appearing in the parameter of functions. A *main* function and a function called with several types of real parameters (in terms of whether being an array, a constant and etc.) suffice.  
 
 ### Step 8 Initializations
 #### Framework
-Here we only talk about the initilization of arrays. With this, that of scalars will be trivial.  
+Here we only talk about the initialization of arrays. With this, that of scalars will be trivial.  
 
 At the beginning, I did not even understand the semantic of initialization lists. In other words, I cannot even accomplish array initializations manually. Thanks to our group members, I finally get through it. The semantic rules are as follows:
   - Each pair of braces is responsible for the initialization of an array (or a subarray), with the outmost one responsible for the entire array.  
@@ -634,7 +634,7 @@ Therefore, two values need to be maintained during initialization:
   - a pointer to the current element that is being initialized.
 
 After elements within a pair of braces run out, the remaining should be initialized as 0. **Special check** is needed for a pair of braces without any element between them, since for convenience, the end of initialization is identified by modulus (in this case, zero element will lead to an immediate termination, which contradicts the semantic).  
-Complete procedures are summarized as follows (suppose we are to intialize an array called ```arr```):
+Complete procedures are summarized as follows (suppose we are to initialize an array called ```arr```):
   - 1. Compute the array that specifies how many elements should be initialized in this pair of braces. Let us call this array ```NumEle```.
   - 2. Set the pointer to ```NumEle``` as -1. Set the pointer to the current element that is being initialized to 0. Let us call them ```ptr_num``` and ```cur_pos``` respectively.
   - 3. When an element in the intialization list is encountered, intialize ```arr[cur_pos]``` with it, and let ```cur_pos = cur_pos + 1```. When a left brace is encoutered, let ```ptr_num = ptr_num + 1```. When a right brace is encountered, if the right brace directly follows a left brace (that is, this list is empty), initialize all the element as 0 (```NumEle[ptr_num]``` elements in total); else, intialize all the remaining elements to 0 (the termination condition can be ```cur_pos % NumEle[ptr_num] == 0```); finally, let ```ptr_num = ptr_num - 1``` in both cases.
@@ -643,13 +643,13 @@ Complete procedures are summarized as follows (suppose we are to intialize an ar
 #### Test Case
 You should try different types of initialization lists. Typically, an array with no more than 4 dimensions suffices. Both variable and constant arrays should be tried.  
 
-Besides arrays, initilizations of scalars (both variables and constants) should also be checked, although the probability of making mistakes here is much lower.  
+Besides arrays, initializations of scalars (both variables and constants) should also be checked, although the probability of making mistakes here is much lower.  
 
 ### Step 9 Instruction Reordering
 #### Framework
 It is all about instruction reordering. Variable declarations should be moved to the beginning of their corresponding functions, and initializations of global variables should be moved into *main* function, right following the variable declarations.  
 
-To determine the type of instructions (whether being a declarations, an initialization or something else), remove the output of indent and examining the a few letters at the beginning of each instruction is enough.  
+To determine the type of instructions (whether being a declaration, an initialization or something else), remove the output of indent and examining the a few letters at the beginning of each instruction is enough.  
 
 ## Acknowledgments
 Thanks to my teachers, classmates, group members and roommates, also teaching assistants. Without their help, the design and implementation of this project will surely not be so smooth.  
