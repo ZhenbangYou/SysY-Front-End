@@ -489,6 +489,8 @@ For the **short circuit expression**, you should find somewhere to store those j
 
 For *if* statement, the scheme discussed in the **framework** always generate a ```goto After``` instruction regardless of whether there is *else*, thus leading to wasteful ```goto```. There is a simple remedy: delay the emission of ```goto After``` until the keyword ```else``` is seen.  
 
+In addition, two production rules regarding *if*, namely with and without *else*, should be merged to avoid a reduce/reduce conflict.  
+
 For relation expression, pay attention to a corner case like ```if(x)``` since ```if x goto L``` is illegal in *Eeyore*; instead, you should emit ```if x == 0 goto L```. For uniformity, you can solve every relation expression into a single variable (namely *Atom* mentioned in the **short circuit expression**), and then always use instructions like ```if x == 0 goto L```.  
 
 #### Test Case
