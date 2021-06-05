@@ -75,7 +75,10 @@ Nearly all of my classmates choose the former; however, I prefer the latter. Jus
 
 In addition, **incremental developing** helps a lot. Specifically, by dividing the project into several steps as is shown below and testing each part on finishing (by virtue of the one-pass scheme), a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-effective.  
 
-**How to debug**
+No matter how you design your own compiler, keep in mind that for the covenience of debugging, your compiler had better **output enough information in every step**. Some students design compilers in a way that output can only be obtained after the whole project is finished; as a consequence of this, the difficulty of debugging is truly prohibitive!  
+
+**How to debug**  
+
 Bugs are not formidable, as long as they are restricted in limited area and can be easily fixed. This is exactly the wonderful characteristic of this design!  
 
 Besides, this documentation provides exhaustive guideline on how to construct test cases. You can verify your compiler by reading the output code of these cases.  
