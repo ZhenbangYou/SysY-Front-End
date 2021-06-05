@@ -487,9 +487,34 @@ From the perspective of caller, there are also 3 things to be handled (and they 
   - parameter passing.
   - obtaining return values.
 
-Registration and lookup of function name can be done by a hash table, just like **symble table**.  
+Registration and lookup of function name can be done by a hash table, just like the **symble table**.  
 
-For the registration of parameters, a new method is needed for the **variable record**, and one parameter is needed for this method to show how many parameters of this function have been registered.  
+For the registration of parameters, a new method is needed for the **variable record**, and one parameter is needed for this method to show how many parameters of this function have been registered. Although the order of counting is **irrelevant** to the correctness of produced code, by the convetion, I count from the left. 
+
+Besides, since the name of a parameter and the name of a variable defined in the outmost scope of same function cannot be the same, we need to add an extra **symbol table** for parameters, whose scope lies just outside outmost scope of the function. Every time a new variable is declared, you should check whether the second last element of the **symbol table stack** is a **symbol table** of parameters and if yes, whether that name has been occupied by certain parameter.  
+
+Parameter passing is quite error-prone. Think about the following example:  
+```
+f(0, g(1))
+```
+A incorrect scheme (adopted by many students) works as follows:
+  - When 0 is read, emit ```param 0```.
+  - When 1 is read, emit ```param 1```.
+  - Call ```g``` and put the return value as the second parameter.
+  - Call ```f```.
+
+Evidently, the parameter set in the first operation is garbled by the second operation.  
+
+In contrast, the correct procedures are as follows:  
+  - When a parameter is read and solved (like g(1), the solving of parameters may be necessary sometimes), put it into a list (can be implemented by *vector* in *C++*).
+  - When all parameters are read and solved, put them into correct positions one by one.
+
+Within the callee, sometimes there is no such instruction as ```return```. Meanwhile, sometimes it is also impossible to analyze all the possible control flow to determine whether there is at least one ```return``` instruction in each path. As a result, a simple and also the only practical way is to add an extra ```return``` instruction right before the the end of each function.  
+
+For the caller, obtaining return value is straightforward----just by an equal sign ("="). As a one-pass code generator does not know whether this return value will be used later, it will always get the return value as long as there is one. From a standpoint of assembly language, no matter used or not, the return value always resides there (*a0* for RISC-V 32I and *%rax* for x86).  
+
+#### Detail
+
 ### Step 6 Constants
 I create an entry in symbol table for each constant, but I do not create a temporary variable for it. That being said, I emit the value of the constant every time I am confronted with it. Plus, every time an operation is performed, I check whether all the source operands are constants; if they are, the destination operand will also be a constant, thus no temporary variable being created.  
 You may find out that this is not suitable for arrays of constants, as the subscripts can be variables. This is true. Nonetheless, based on my principles, I choose to delay it until I need to deal with arrays.  
