@@ -36,12 +36,9 @@ g++ -Wno-register -O2 -lm -std=c++17 lexer.yy.cpp parser.tab.cpp -o compiler -Id
 You may replace *parser.y* with *parser_without_inherited_attributes.y*  
 
 ## Principles
-Seminal principle: Avoiding Bugs through Simplicity  
+Primary principle: Avoiding Bugs through Simplicity  
 
 Important principles: Modularization, Regularization and Building Incrementally
-
-## Aside
-**Inherited Attributes** mentioned in this documentation is different from that in the *dragon book*. Mathematically speaking, attributes inherited from siblings are used in this project. However, from the perspective of implementation, this kind of attributes can be implemented in the same way as **synthesized attributes**. Specifically, notations in the form of a dollar followed by a non-positive number such as $-1 will not be used in one of the implementations. This is quite important since notations like $-1 is much trickier to handle correctly.  
 
 ## Uniqueness
 Distinct from the designs of my classmates, mine is the so-called "one-pass intermediate code generator" which I believe is exactly the pattern used in the industry.  
@@ -60,10 +57,13 @@ Since I do not need to deal with anything regarding AST(abstract syntax tree), t
 
 In addition, since I can output code intermediately, I can easily check the correctness of each part once it is done.  
 
-**Contributution**
+**Contributution**  
 This is the first one-pass code generator in this semester. What's more, to the best of my knowledge, those who also implement their compilers in this way are all deeply affected by this project, either encouraged by the success of this project or inspired by the design scheme adopted by this project. One of the classmate told me that, since the feasibility and simplicity of the one-pass scheme had been convincingly proved by this project, he was so confident about this scheme that he finally implement in this way and also achived fairly high developing efficiency.  
 
 You may ask about how to verify the feasibility, given that this is exactly the first work. The answer is, actually, quite simple: by mathamatics. Specifically, the toughest part of verification lies in those requiring *inherited attributes*. However, as shown in the aside in *chapter 5.5.4* of *Dragon Book*, **all L-attributed SDD on an LL grammar can be adapted to an equivalent SDD on an LR grammar**, which absolutely solve the problem raised above.  
+
+**Aside**  
+**Inherited Attributes** mentioned in this documentation is different from that in the *dragon book*. Mathematically speaking, attributes inherited from siblings are used in this project. However, from the perspective of implementation, this kind of attributes can be implemented in the same way as **synthesized attributes**. Specifically, notations in the form of a dollar followed by a non-positive number such as $-1 will not be used in one of the implementations. This is quite important since notations like $-1 is much trickier to handle correctly.  
 
 ## Ways to Avoid Bugs
 There are mainly 2 ways:  
@@ -221,7 +221,112 @@ Every operation including parentheses should be involved. Make up expressions as
 ### Step 4 *if* & *while*
 #### Reason for the Planning
 Now that there are many alternatives for the current step. In addtion to *if* and *while*, we can deal with **arrays**, **functions** and **constants**. Actually, *if* and *while* are quite independent from the other components. We choose this due to the unique characteristics of *if* and *while*: trickiness and only little code needed. As a result of this, we can verify the correctness of this tricky part when the program is still quite simple. Admittedly, there will not be too many differences if other parts are implemented before this.  
+
 #### Framework
+Generally spearking, this step consists of 4 parts:  
+  - *if* statement and *while* loop themselves
+  - Relation expressions like *A == B* and *A < B*
+  - Short circuit expressions
+  - *break* and *continue*
+
+Owing to the difficulty and centrality of the second part, namely **short circuit expression**, our discussion starts here.  
+
+Each **short circuit expressions** can be formalized as a hierachy and I will list them below following a **bottom-up** order (the same as the LR parser):  
+  - Atom (*EqExp* in this project), namely an expression whose value (may be determined at runtime or compilation time) can be store into a single variable.
+  - Logical "*and*" expressions (abbreviated as *LAndExp*, the same name is used in this project) like *Atom_0 && Atom_1*.
+  - Logical "*or*" expressions (abbreviated as *LOrExp*, the same name is used in this project) like *Atom_00 && Atom_01 || Atom_10 && Atom_11*.
+  - The whole short circuit expression itself (*Cond* in this project, the same name will be used in this documentation later) that is directly used as a whole in the pair of parentheses following *if* and *while*.
+
+Below, I will refer to each of the hierachy as **component**.  
+
+Now the central problem is, how to obtain labels (i.e., target jump addresses) and where to emit *goto* instructions.  
+
+Note again that this code generator is designed in an absolute one-pass style; that is, **no extra data structures or backpatching** will be employed.  
+
+Before the discussion of the SDT, let us examine which kind of labels are needed for each component:  
+  - LAndExp: false labels. When reduction of *LAndExp -> Atom* or *LAndExp -> LAndExp_1 -> LAndExp && Atom* occurs, emit ```if Atom == 0 goto (false label)```, and the false labels of *LAndExp* and *LAndExp_1* are the same.
+  - LOrExp: true labels. When redution of *LOrExp -> LAndExp* or *LOrExp -> LOrExp_1 || LAndExp* occurs, emit ```goto (true label)```, and the true labels of *LOrExp* and *LOrExp_1* are the same.
+  - Cond: false labels. When reduction of *Cond -> LOrExp* occurs, emit *goto (false label)*.
+
+The above can be best illustrated with the following example:  
+```
+Cond
+->
+LOrExp
+-> 
+LOrExp_0 || LAndExp_1
+-> 
+LAndExp_0 || LAndExp_1
+-> 
+LAndExp_00 && Atom_01 || LAndExp_10 && Atom_11
+-> 
+Atom_00 && Atom_01 || Atom_10 && Atom_11
+```
+This should be translated into the following:
+```
+if Atom_00 == 0 goto L0
+if Atom_01 == 0 goto L0
+goto L1  // All boolean tests in LOrExp_0/LAndExp_0 turn out be true, so go to the true entry of Cond
+L0:  // If any of the boolean tests in LOrExp_0/LAndExp_0 turns out be false, go here for further boolean tests
+if Atom_10 == 0 goto L2
+if Atom_11 == 0 goto L2
+goto L1  // All boolean tests in LAndExp_1 turn out be true, so go to the true entry of Cond
+L2:  // If any of boolean tests in LAndExp_1 turn out be false, go here, although there is no more boolean test
+goto L3  // All boolean tests in Cond/LOrExp turn out to be false, so go to the false entry of Cond
+```
+|Label|Meaning|
+|:---|:---|
+|L0|the false label shared by *LAndExp_00* and *LAndExp_0*|
+|L1|the true label shared by *LOrExp_0* and *LOrExp*, also the true label of *Cond*|
+|L2|the false label shared by *LAndExp_00* and *LAndExp_0*|
+|L3|false label of *Cond*|
+
+Note that a one-pass code generator is **not able to know whether there are further boolean tests** when L0/L2 is generated, but this does not matter.
+
+Before moving on, make sure you have completely comprehended this example. Please!  
+
+For each component, when a label is needed, there are only 2 ways to obtain it:
+  - generate by itself.
+  - inherit from others.
+
+Also, as shown in the above example, one label may be shared by more than one component. That being said, only one of them generate the label, others just inherit it. Therefore, the core of the scheme is:
+  - who is responsible for generating the label?
+  - from whom does a component inherit the label?
+
+If labels are generated at higher and passed down, it is called a **top-down** scheme. On the contrary, if labels are generated at lower level and passed up, it is called a **bottom-up** scheme. Both schemes will be carefully examined below. If you are not able to tell the differences between these 2 styles, please refer to chapter 4 and 5 of the *Dragon Book* before moving on.  
+
+Since I build the compiler based on *Yacc* that works in a **bottom-up** style, the scheme whose style is consistent with *Yacc* will be easier to implement. Thus we are going to start from this scheme.  
+
+More precisely, a **bottom-up** label generation scheme means that labels are generated until they are used (that is, when conditional/unconditional *goto* is emitted). This had better be shown with an example. When the following reductions are performed one by one:
+```
+Atom_0 && Atom_1
+=>
+LAndExp_0 && Atom_1
+=>
+LAndExp
+```
+the first label needed is the false label of LAndExp_0, when *Atom_0* is reduced to *LAndExp_0*. According to our guideline, this label should be generated by *LAndExp_0*. Later, when *LAndExp_0 && Atom_1* is reduced to *LAndExp*, the false label of *LAndExp_0* is passed to *LAndExp* since they two share the same false label.  
+
+True labels of *LOrExp* can be handled in a similar way. This can be an exercise for yourself (although complete SDT will be presented later, please think about it now, since this is really something interesting)!  
+
+When the component of the highest level, namely *Cond*, is created via reduction, its true label has been specified (generated by the *LorExp* reduced from a single *LAndExp*) and should serve as the true entry of an *if* statement or the entry of a *while* loop that specifies the begin of its body, while its false label has yet to be specified.  
+
+As you have seen, this scheme can be implemented without **inherited attributed**. In other words, all attributes are either synthesized or inherited from siblings. The complete SDT is as follows:  
+```
+Cond -> LOrExp {Cond.True = LOrExp.True; print("goto Cond.False");}
+
+LAndExp -> 
+               Atom {LAndExp.False = NewLabel();      print("if Atom == 0 goto LAndExp.False");}
+| LAndExp_1 && Atom {LAndExp.False = LAndExp_1.False; print("if Atom == 0 goto LAndExp.False");}
+
+LOrExp -> 
+              LAndExp {LOrExp.True = NewLabel();    print("goto LOrExp.True"); printLabel("LAndExp.False");}
+| LOrExp_1 || LAndExp {LOrExp.True = LOrExp_1.True; print("goto LOrExp.True"); printLabel("LAndExp.False");}
+```
+Now have a break and rethink if you have fully grasped all the ideas and details involved in this SDT. I know it is far from being easy. Unfortunately, the scheme we will discuss next, namely the **top-down** one, is even harder to understand and come up with.  
+
+
+
 As is known to all, *if* and *while* each need 3 labels.  
 The problem is how to implement short circuit by one pass? There are much easier ways to implement it with two passes, which is discussed in page 408, section 6.6.6 of *Dragon Book*.  
 I admit this is the most difficult and the only difficult part of this project.  
