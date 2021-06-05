@@ -74,8 +74,8 @@ Nearly all of my classmates choose the former; however, I prefer the latter. Jus
 
 In addition, **incremental developing** helps a lot. Specifically, by dividing the project into several tasks as shown above and testing each part on finishing (by virtue of one-pass scheme), a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-saving.  
 
-**How to find bugs**
-By checking generated code.  
+**How to debug**
+Bugs are not formidable, as long as they are restricted in limited area and can be easily fixed. This is exactly the wonderful characteristic of this design!  
 
 ## Project Files Overview
 This project consists of only 2 files:
@@ -83,6 +83,8 @@ This project consists of only 2 files:
   - a *Parser*, namely *parser.y*, written in *Yacc*, responsible for everything else, including the **SDT** (core of this project) and class definitions such as a variable table.
 
 As you have seen, the lexer is kept as simple as possible (thus consisting of just about a half hundred lines of code). In sharp contrast to this, the parser accomplishes everything else; therefore, you will find about a thousand lines of code in the parser.  
+
+Generally speaking, this project is build revolving the **CFG**. Deal with separate parts in different steps, thus achieving high degree of decoupling and modularity.  
 
 Adding the aforementioned lines above, it is easily seen that the whole project can be finished with just about a thousand lines of code or slightly more (if not less), which is ***less than half*** of the code length of common design scheme (a great bliss for those weak at coding!).  
 
@@ -93,7 +95,7 @@ Divided in to 9 steps.
 |1|REX & CFG|Modifying EBNF|
 |2|Variable Declarations|Scope|
 |3|Expressions & Statements|(Easy)|
-|4|*if* & *while*|Short Circuit|
+|4|*if* & *while*|Short Circuit Expression|
 |5|Functions|(Easy)|
 |6|Constants|Value Recording|
 |7|Arrays|Offset & Constant Elements|
@@ -105,6 +107,13 @@ There is only one difficult part, namely step 4.
 P.S.: One-pass scheme refers to the first 8 steps(step 9 is rather trivial), whose output is different from Eeyore in 2 aspect:  
   - Definitions of local variables may appear at someplace besides the beginning of functions.
   - Initializations of global variables can appear outside any function.
+
+## How to Get Started
+I have been always hearing students saying that, "I am not good at programming, I am not familiar with compiler design and I am not able to figure out all the details of such a hugh project. How can I ever conquer the *Monster* of the complexity of compiler design?"  
+
+My answer always come in the following way:  
+  - Get your hands dirty with some trivial parts, no matter how trivial it is. In my design, **Step 1,2 and3** are all quite simple. However, they can really help you procure confidence! Indeed, once you finish the **short circuit expression**, there will no longer be any essential obstruction.
+  - Although you do need to consider the general framework before getting start, it is both unnecessary and impossible to get every detail clear. In reality, it suffices to prove the feasibility mathematically. Besides, the feasibility has been proved by this project practically. Why not just have a try?
 
 ## Thoughts of Each Step
 For each step, I will first present **general ideas and frameworks**, then discuss some **impletation details and pitfalls**, and finally I will also present **test cases** in accordance with all the frameworks and details mentioned above (as a result, you no longer need any test cases provided by others!). Plus, the reason for the **planing** (i.e., what exactly should be done next and what should be done in the future) will be discussed at the beginning of each step. All in all, you will find 4 sub-steps in each step. If any part does not appear, that must be because there is nothing to say about it. 
@@ -188,7 +197,7 @@ Let us talk a bit more about the way to output. For debugging and redirection, *
 
 #### Test Case
 
-Now you need a program consisting of merely variable definitions and braces. Variables in different scopes can have the same name. Besides, check whether your compiler will throw an error when a variable is redefined, and whether the line number is correct in the error report. A single program with no more than 5 scopes in total suffices.
+Now you need a program consisting of merely variable definitions and braces. Variables in different scopes can have the same name. Besides, check whether your compiler will throw an error when a variable is redefined, and whether the line number is correct in the error report. A single program with no more than 5 scopes in total suffices.  
 
 ### Step 3 Expressions & Statements
 #### Reason for the Planning
@@ -213,6 +222,8 @@ To avoid leaving out adding actions for some production rules, start with the to
 
 #### Test Case
 Every operation including parentheses should be involved. Make up expressions as complex as possible. Check whether the associativities and precedences are correct. Also, whether the lookups of variables are correct.  
+
+Although we have not dealt with functions yet, you still need to write expressions in *main*; otherwise, *Yacc* will throw an error. Keep in mind that, although we have not finished yet (that is to say, correct *Eeyore* code cannot be produced completely), syntax errors will still be found by *Yacc* as long as your **CFG** is correct.  
 
 ### Step 4 *if* & *while*
 #### Reason for the Planning
@@ -415,9 +426,9 @@ The reducing process with actions is as follows:
 |24|(Cond.true, Cond.false), LOrExp||Reduce by Cond -> LOrExp||
 |25|(Cond.true, Cond.false), Cond||Done!||
 
-Finally, our discussion about the *formidable* **short circuit expression** has come to an end! This part does requite a lot of thinking! The organization and narration of this part also require careful consideration and exemplification. Obviously, the **bottom-up** scheme is easier to come up with and implement.  
+Finally, our discussion about the *formidable* **short circuit expression** has come to an end! This part does requite a lot of thinking! The organization and narration of this part also require careful consideration and exemplification. Obviously, the **bottom-up** scheme is easier to come up with and implement. However, the first scheme that came up first to me is indeed the tougher and more complex one, presumably because my first design in this step started from *if* and *while* rather than the **short circuit expression**. As a brief summary, since *Yacc* analyzes the program in a **bottom-up** style, keeping thinking in the same style turns out to be the better way (obviously, *Cond* lies in the *bottom* of *if* and *while*). However, since the nature of human goes in the reverse way, the greatest obstacle lies in the cooperation between human brain and the math.
 
-Let me say a few more words about this. As you may have realized, the difficulities of the design of these schemes lie in the so-called **reverse thinking**. Although you may crack this part with a hybrid method (two-pass here, one-pass elsewhere) or backpatching, this one-pass scheme is really elegant and requires very little code. Awesome!  
+All in all, the difficulities of the design of these schemes lie in the so-called **reverse thinking**. Although you may crack this part with a hybrid method (two-pass here, one-pass elsewhere) or backpatching, this one-pass scheme is really elegant and requires very little code. Awesome!  
 
 ##### Everything Else about the Framework
 After **short circuit expression**, there are no obstacles any more in terms of the front end.  
@@ -572,6 +583,15 @@ Besides, the following fields should be added to the **variable record**:
   - a *deque* field holding the values of elements for constant arrays.
   - two pointers to variable records to accomodate an array access (as an array access can appear as a left value in the left hand side of an assignment, a **variable record** ought to be able to represent an array access which involves another two **variable records**).
   - a boolean field specifying whether being an array access can be added **for convinience**, which is **not mandatory**.
+
+Thus two new methods are needed to add new **variable record**, one for arrays and the other for array accesses.  
+
+Let us make a brief summary about methods needed in the **variable recors** in order to add new instances:
+  - one to add a scalar variable
+  - one to add a parameter
+  - one to add a constant
+  - one to add an array (either variable or constant)
+  - one to add an array access
 
 #### Detail
 Do not forget to declare a constant array since the subscripts can be variables.  
