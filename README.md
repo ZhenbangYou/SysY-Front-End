@@ -107,14 +107,11 @@ P.S.: One-pass scheme refers to the first 8 steps(step 9 is rather trivial), who
   - Initializations of global variables can appear outside any function.
 
 ## Thoughts of Each Step
-For each step, I will first present **general ideas and frameworks**, then discuss some **impletation details and pitfalls**, and finally I will also present **test cases** in accordance with all the frameworks and details mentioned above (as a result, you no longer need any test cases provided by others!). Plus, the reason for the **planing** (i.e., what exactly should be done next and what should be done in the future) will be discussed at the beginning of each step. All in all, you will find 4 sub-steps in each step.  
+For each step, I will first present **general ideas and frameworks**, then discuss some **impletation details and pitfalls**, and finally I will also present **test cases** in accordance with all the frameworks and details mentioned above (as a result, you no longer need any test cases provided by others!). Plus, the reason for the **planing** (i.e., what exactly should be done next and what should be done in the future) will be discussed at the beginning of each step. All in all, you will find 4 sub-steps in each step. If any part does not appear, that must be because there is nothing to say about it. 
 
 Before delving into those steps, keep one thing in mind: since we have carefully considered the order of implementation (i.e., the division of the whole task into steps, and the order of steps), do not think about what you need to do in the future steps when working on the current steps; for instance, when dealing with the definition of variables, never care about constants, as the division and the ordering have guaranteed that everthing can be done step by step smoothly.  
 
 ### Step 1 REX & CFG
-#### Reason for the Planning
-*REX* and *CFG* serve as foundations for this projects, so there is virtually nothing to argue here.  
-
 #### Framework
 Basically just modify the given *EBNF*, although some regular expressions need to be made up by ourselves.  
 
@@ -157,12 +154,9 @@ For **CFG**, the only thing we can test here is whether it will report *syntax e
 Note that there will be a **shift/reduce conflict**, namely the renowned **dangling else**. If more conflicts are reported, there must be bugs.  
 
 ### Step 2 Variable Declarations
-#### Reason for the Planning
-Now that we have both **lexer** and **CFG**, variable declarations are the startpoint of everything else.  
-
+#### Framework
 It should be made clear that we only deal with scalar variables here; that is, other than constants, parameters or arrays; besides, we do not care about initializations.  
 
-#### Framework
 First, there should be a data structure to record necessary information about each variable (class *Var* in this project. I will call it **variable record** below). At present, since there are just scalar variables, the only thing we need to record is the unique sequence number for each variable (surely there should be more information recorded, but according to our developing principles we just care about this single field, i.e., *SeqNo* in this project). The data structure for **a single variable** is done.  
 
 Second, let consider how to assemble variables into data structures. At the moment, let us go without scopes. Scopes form a hierachy, so let us get rid of scopes and think about the situation where every variable is a global variable. Now comes the central problem: how to find the corresponding variable with its unique name? The answer is rather simple: with a hash table (*unordered_map* in *C++*), where variable names serve as keys and pointers to **variable records** serve as values. Now the so-called "**symble table**" (class *Env* in this project) is done, which is the data structure for **variables within the same scope**.  
@@ -518,9 +512,6 @@ Within the callee, sometimes there is no such instruction as ```return```. Meanw
 
 For the caller, obtaining return value is straightforward----just by an equal sign ("="). As a one-pass code generator does not know whether this return value will be used later, it will always get the return value as long as there is one. From a standpoint of assembly language, no matter used or not, the return value always resides there (*a0* for RISC-V 32I and *%rax* for x86).  
 
-#### Detail
-Has been specified in the **framework**.
-
 #### Test Case
 You only need a single program with several functions. Since either or both of the parameter list and return value can be void, your functions should cover all these cases.  
 
@@ -554,9 +545,6 @@ Identification of constants can be adhered to the handling of expressions. Again
 Similar to that of expressions: a program consisting of every kind of operations, except that the variable operands are replaced by constants now. Check the result of constant operations by using it as a parameter (or some other means).  
 
 ### Step 7 Arrays
-#### Reason for the Planning
-Since only 2 steps are left, and the difficulties of initializations are all concerned with arrays, it is quite obvious why I choose this as **Step 8**.  
-
 #### Framework
 Arrays involves two things:
   - definition.
@@ -592,9 +580,6 @@ Do not forget to declare a constant array since the subscripts can be variables.
 Both arrays and indices can be variables or constants, and your program should cover all of these cases. Also, the dimension of the index can be equal to or less than that of the array, with the latter case appearing in the parameter of functions. A main function and a function called with several types of real parameters (in terms of whether being an array, a constant and etc) suffice.  
 
 ### Step 8 Initializations
-#### Reason for the Planning
-Because this is the last step, there is nothing to talk about here.  
-
 #### Framework
 Here we only talk about the initilization of arrays. With this, that of scalars will be trivial.  
 
@@ -618,14 +603,18 @@ Complete procedures are summarized as follows (suppose we are to intialize an ar
   - 1. Compute the array that specifies how many elements should be initialized in this pair of braces. Let us call this array ```NumEle```.
   - 2. Set the pointer to ```NumEle``` as -1. Set the pointer to the current element that is being initialized to 0. Let us call them ```ptr_num``` and ```cur_pos``` respectively.
   - 3. When an element in the intialization list is encountered, intialize ```arr[cur_pos]``` with it, and let ```cur_pos = cur_pos + 1```. When a left brace is encoutered, let ```ptr_num = ptr_num + 1```. When a right brace is encountered, if the right brace directly follows a left brace (that is, this list is empty), initialize all the element as 0 (```NumEle[ptr_num]``` elements in total); else, intialize all the remaining elements to 0 (the termination condition can be ```cur_pos % NumEle[ptr_num] == 0```); finally, let ```ptr_num = ptr_num - 1``` in both cases.
-
-#### Detail
-Has been discussed in the **framework**.  
+  - 4. Repeat 3.
 
 #### Test Case
+You should try different types of initialization lists. Typically, an array with no more than 4 dimensions suffices. Both variable and constant arrays should be tried.  
 
+Besides arrays, initilizations of scalars (both variables and constants) should also be checked, although the probability of making mistakes here is much lower.  
 
 ### Step 9 Instruction Reordering
-Well, it is way too trivial ...  
+#### Framework
+It is all about instruction reordering. Variable declarations should be moved to the beginning of their corresponding functions, and initializations of global variables should be moved into *main* function, right following the variable declarations.  
+
+To determine the type of instructions (whether being a declarations, an initialization or something else), remove the output of indent and examining the a few letters at the beginning of each instruction is enough.  
+
 ## Acknowledgments
 Thanks to my classmates, group members and roommates, also teaching assistants. Without their help, the design and implementation of this project will surely not be so smooth.  
