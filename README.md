@@ -169,6 +169,8 @@ Second, let consider how to assemble variables into data structures. At the mome
 
 Third, let us take the aforementioned hierachy into account. As is known to all (that have basic knowledge about *C/C++*), at any point of a program, live scopes forms a total order. In other words, taking any two live scopes *A* and *B*, one of the following two must hold true: *A* is subset of *B*, or *B* is subset of *A*. Therefore, scopes can be organized into a stack, each of whose element is a symble table; when a new scope come into being, a new symble table will be pushed into the stack; when a scope ends, the top element of the stack will be popped out. Finally, the data structure for **all variables** (field *top* in class *Parser* in this project) is formed (let us call it **symble table stack**).  
 
+In addition, the daclarations of a series of variables within the same statement should be performed from the left to the right, as a variable can be intialized with the value of the variable that is declared at the left within the same statement. For example, ```int a = 0, b = a;``` is legal.  
+
 #### Details
 In fact, many details have been discussed in the **Framework**. However, there are also some details left.  
 
@@ -476,6 +478,9 @@ Finally, make up some *if* statements and *while* loops and make them nested. Do
 Once again, a single program is sufficient for the test. However, this time, reading the output of your compiler becomes much harder due to labels and *goto*.  
 
 ### Step 5 Functions
+#### Reason for the Planning
+Indeed, this step is virtually independent from the other three. So you can also implement the other three first.  
+
 #### Framework
 From the perspective of callee, there are 3 things to be handled:  
   - registration of function name.
@@ -489,7 +494,7 @@ From the perspective of caller, there are also 3 things to be handled (and they 
 
 Registration and lookup of function name can be done by a hash table, just like the **symble table**.  
 
-For the registration of parameters, a new method is needed for the **variable record**, and one parameter is needed for this method to show how many parameters of this function have been registered. Although the order of counting is **irrelevant** to the correctness of produced code, by the convetion, I count from the left. 
+For the registration of parameters, a new method is needed for the **variable record**, and one parameter is needed for this method to show how many parameters of this function have been registered. Although the order of counting is **irrelevant** to the correctness of produced code, by the convetion, I count from the left. The order of counting is determined by associativity of the production rule.  
 
 Besides, since the name of a parameter and the name of a variable defined in the outmost scope of same function cannot be the same, we need to add an extra **symbol table** for parameters, whose scope lies just outside outmost scope of the function. Every time a new variable is declared, you should check whether the second last element of the **symbol table stack** is a **symbol table** of parameters and if yes, whether that name has been occupied by certain parameter.  
 
@@ -514,20 +519,112 @@ Within the callee, sometimes there is no such instruction as ```return```. Meanw
 For the caller, obtaining return value is straightforward----just by an equal sign ("="). As a one-pass code generator does not know whether this return value will be used later, it will always get the return value as long as there is one. From a standpoint of assembly language, no matter used or not, the return value always resides there (*a0* for RISC-V 32I and *%rax* for x86).  
 
 #### Detail
+Has been specified in the **framework**.
+
+#### Test Case
+You only need a single program with several functions. Since either or both of the parameter list and return value can be void, your functions should cover all these cases.  
+
+Check whether an extra ```return``` instruction has been added.  
+
+Check whether the parameters can be passed (recall the ```f(0, g(1))```) and looked up correctly.  
+
+Finally, check whether the return value can be used by the caller correctly.  
 
 ### Step 6 Constants
-I create an entry in symbol table for each constant, but I do not create a temporary variable for it. That being said, I emit the value of the constant every time I am confronted with it. Plus, every time an operation is performed, I check whether all the source operands are constants; if they are, the destination operand will also be a constant, thus no temporary variable being created.  
-You may find out that this is not suitable for arrays of constants, as the subscripts can be variables. This is true. Nonetheless, based on my principles, I choose to delay it until I need to deal with arrays.  
+#### Reason for the Planning
+Without correct handling of constants, arrrays and intialzations cannot be handled.  
+
+#### Framework
+Two new field is needed for the **variable record**:  
+  - a boolean field to identify whether it is a constant.
+  - a integer field (later for arrays, an array of integer will be needed. At current, we do not bother caring about arrays) to record the value.
+
+A new method to create a new **variable record** is also needed, obviously.  
+
+Next, we need to identify all the constants, following the rules below:  
+  - the terminal *INT_CONST* specifies a constant.
+  - if all the source operands are constants, then the destination operand will also be a constant.
+
+As you may have found, scalar constant do not need to be declared, and operations with source operand being all constants do not involve an instruction.  
+
+#### Details
+Identification of constants can be adhered to the handling of expressions. Again, start from the highest level to avoid omission.  
+
+#### Test Case
+Similar to that of expressions: a program consisting of every kind of operations, except that the variable operands are replaced by constants now. Check the result of constant operations by using it as a parameter (or some other means).  
+
 ### Step 7 Arrays
-Basically, for arrays of variables, things are just about calculating offsets from subscripts, which can be done by *std::deque*(deque supports pushing and popping from the front, compared with vector). Array definitions and array accesses are mostly the same. Note that the dimension of subscripts can be less than that of the array.
-For arrays of constants, things are just slightly more: we will need to calculate the value when the subscripts are all constants, which can be done by adding a *std::vector* in symbol table entry. In additions, arrays of constants need names.
+#### Reason for the Planning
+Since only 2 steps are left, and the difficulties of initializations are all concerned with arrays, it is quite obvious why I choose this as **Step 8**.  
+
+#### Framework
+Arrays involves two things:
+  - definition.
+  - index.
+
+Since subscripts naturally form a list, *vector* can *deque* can be candidates. We will see later why *deque* is better.  
+
+For definition, just read constant subscripts from left to right and push them into the *deque* one by one.  
+
+Index can be divided into 3 phases:
+  - Collect all the subscripts into a *deque*.
+  - Compute the offset.
+  - If the dimension of the index is equal to that of the array, then the result is an integer, thus represented by an one-dimension array access; if the dimension of the index is less than that of the array, then the result is an array, thus represented by an add.
+
+The first phase is virtually identical to the definition, except that subscripts can be variables besides constants.  
+
+The second phase can be further divided into 2 subphases:
+  - Compute the stride of each dimension of the array, which should be done by multiplication **from right to left** (which explains why *deque* is preferred to *vector*)
+  - Multiply the index of each dimension with the stride, and add them together. This subphase may need to emit instructions.
+
+For example, if the array is ```a[3][4]```, then the *deque* containing its subscripts is ```{3, 4}``` (collected from left to right), the *deque* containing the stride of each dimension is ```{16, 4}``` (computed from right to left). The access ```a[2][3]``` results in ```a[44]``` (16 * 2 + 4 * 3 = 44, and since the dimension of {2, 3} is equal to the dimension of {3, 4}, the result should be an integer, i.e.,an element of ```a```), while the access ```a[3]``` results in ```a + 48``` (16 * 3 = 48, and since the dimension of {3} is less than the dimension of {3, 4}, the result should be a subarray of ```a```).
+
+Besides, the following fields should be added to the **variable record**:
+  - a boolean field specifying whether being an array.
+  - a *deque* field holding the values of elements for constant arrays.
+  - two pointers to variable records to accomodate an array access (as an array access can appear as a left value in the left hand side of an assignment, a **variable record** ought to be able to represent an array access which involves another two **variable records**).
+  - a boolean field specifying whether being an array access can be added **for convinience**, which is **not mandatory**.
+
+#### Detail
+Do not forget to declare a constant array since the subscripts can be variables.  
+
+#### Test Case
+Both arrays and indices can be variables or constants, and your program should cover all of these cases. Also, the dimension of the index can be equal to or less than that of the array, with the latter case appearing in the parameter of functions. A main function and a function called with several types of real parameters (in terms of whether being an array, a constant and etc) suffice.  
+
 ### Step 8 Initializations
+#### Reason for the Planning
+Because this is the last step, there is nothing to talk about here.  
+
+#### Framework
+Here we only talk about the initilization of arrays. With this, that of scalars will be trivial.  
+
 At the beginning, I did not even understand the semantic of initialization lists. In other words, I cannot even accomplish array initializations manually. Thanks to our group members, I finally get through it. The semantic rules are as follows:
-  - Each pair of braces is responsible for the initialization of an array, with the outmost one responsible for the entire array.  
-  - Every time confronted with a left brace, the dimension of array decrements, while a right brace means an increment.  
+  - Each pair of braces is responsible for the initialization of an array (or a subarray), with the outmost one responsible for the entire array.  
+  - Every time confronted with a left brace, the dimension of array decrements, while a right brace leads to an increment.  
   - If there are not enough elements within a pair of braces, the remaining elements are set to 0.  
 
-As long as you can comprehend the aforementioned rules, implementations will be easy. One assignment is needed for each initialization and one additional recording will be needed if it is a constant.  
+For example, for an array ```a[3][4][5] = { {1, 2}, {3, 4, 5, 6, 7, {8, 9} } }```, the number of elements contained in each dimension of subarray is ```{3 * 4 * 5, 4 * 5, 5}```, namely ```{60, 20, 5}```:
+  - ```{ {1, 2}, {3, 4, {5, 6} } }``` is responsible for the initialization of the array ```a``` that contains ```60``` elements (corresponding to the 1st element in the array ```{60, 20, 5}```).
+  - ```{1, 2}``` is responsible for the initialization of the subarray ```a[0]``` that contains ```20``` elements (corresponding to the 2nd element in the array ```{60, 20, 5}```).
+  - ```{3, 4, 5, 6, 7, {8, 9} }``` is responsible for the initialization of the subarray ```a[1]``` that contains ```20``` elements (corresponding to the 2nd element in the array ```{60, 20, 5}```).
+  - ```{8, 9}``` is responsible for the initialization of the subarray ```a[1][1]``` that contains ```20``` elements (corresponding to the 3rd element in the array ```{60, 20, 5}```).
+
+Therefore, two values need to be maintained during initialization:  
+  - a pointer to the array that specifies how many elements should be initialized in this pair of braces.
+  - a pointer to the current element that is being initialized.
+
+After elements within a pair of braces run out, the remaining should be initialized as 0. **Special check** is needed for a pair of braces without any element between them, since for convenience, the end of initialization is identified by modulus (in this case, zero element will lead to an immediate termination, which contradicts the semantic).  
+Complete procedures are summarized as follows (suppose we are to intialize an array called ```arr```):
+  - 1. Compute the array that specifies how many elements should be initialized in this pair of braces. Let us call this array ```NumEle```.
+  - 2. Set the pointer to ```NumEle``` as -1. Set the pointer to the current element that is being initialized to 0. Let us call them ```ptr_num``` and ```cur_pos``` respectively.
+  - 3. When an element in the intialization list is encountered, intialize ```arr[cur_pos]``` with it, and let ```cur_pos = cur_pos + 1```. When a left brace is encoutered, let ```ptr_num = ptr_num + 1```. When a right brace is encountered, if the right brace directly follows a left brace (that is, this list is empty), initialize all the element as 0 (```NumEle[ptr_num]``` elements in total); else, intialize all the remaining elements to 0 (the termination condition can be ```cur_pos % NumEle[ptr_num] == 0```); finally, let ```ptr_num = ptr_num - 1``` in both cases.
+
+#### Detail
+Has been discussed in the **framework**.  
+
+#### Test Case
+
+
 ### Step 9 Instruction Reordering
 Well, it is way too trivial ...  
 ## Acknowledgments
