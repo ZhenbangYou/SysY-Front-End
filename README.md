@@ -704,6 +704,16 @@ This part is even more trivial. You can finish this with mere macro expansion.
 
 Pay attention to the range of immediate number field (it appears nearly everywhere, including the computation of the stack pointer) in the instruction format of *RISC-V*. By the way, this also serves as an important means for optimizations!  
 
+There is a subtle detail regarding performance. Recall that the lowest positions are reserved for parameters. There are two schemes concerning this:
+  - Allocate 8 positions, no matter how many parameters there are.
+  - Allocate positions according to the number of parameters.
+
+As is shown by the field tests, the former scheme outperforms the latter one by a noticeable margin. My guess is that, this has something to do with cache locality and thrashing.  
+
+There are some simple optimizations that can be done:
+  - cascade ```goto``` elimination.
+  - replacing ```beq``` with ```ble```, ```bge``` and ```bne``` to reduce one operation.
+
 ## Acknowledgments
 Thanks to my teachers, classmates, group members and roommates, also teaching assistants. Without their help, the design and implementation of this project will surely not be so smooth.  
 
