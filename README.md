@@ -25,6 +25,8 @@ This code generator translates *SysY* in to *Eeyore*.
 
 I feel it quite necessary to record my thoughts about the planning and developing of this project, which is exactly the origin of the first version of this documentation. But now I feel it even more meaningful to organize my thoughts so that others can build a compiler that is able to pass all the functional tests in a short period of time.  
 
+Although this documentation lists plenty of details, you should always refer to those aforementioned documentations to avoid unnecessary misunderstandings.  
+
 ## Usage
 ```Bash
 git clone https://github.com/ZhenbangYou/SysY-Front-End.git  
@@ -77,7 +79,7 @@ Nearly all of my classmates choose the former; however, I prefer the latter. Jus
 
 In addition, **incremental developing** helps a lot. Specifically, by dividing the project into several steps as is shown below and testing each part on finishing (by virtue of the one-pass scheme), a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-effective.  
 
-No matter how you design your own compiler, keep in mind that for the covenience of debugging, your compiler had better **output enough information in every step**. Some students design compilers in a way that output can only be obtained after the whole project is finished; as a consequence of this, the difficulty of debugging is truly prohibitive!  
+No matter how you design your own compiler, keep in mind that for the convenience of debugging, your compiler had better **output enough information in every step**. Some students design compilers in a way that output can only be obtained after the whole project is finished; as a consequence of this, the difficulty of debugging is truly prohibitive!  
 
 **How to debug**  
 
@@ -668,7 +670,7 @@ Since this documentation is for the front end, I will not delve into the back en
 ### Into Tigger
 For simplicity, you do not need extra code to translate *Eeyore* into *Tigger*. Just modify the existing code generator!  
 
-Only keypoints are discussed here, details like how to computer the size of the stack frame should be figured out by readers, since they are way too easy.  
+Only key points are discussed here, details like how to computer the size of the stack frame should be figured out by readers, since they are way too easy.  
 
 ### Variable Type in Tigger
 There are six types of variables in *Tigger*:  
@@ -687,7 +689,7 @@ There are six types of variables in *Tigger*:
 |Global Scalars|*.common* or *.data*, but only the former is used in our design. This also applies to global arrays.|
 |Global Arrays|*.common* or *.data*. **The array name identifies the first element of the array, rather than the address of the first element!**|
 |Parameters|Should be stored in the stack, as parameter registers may be garbles during function calls. For convenience, just allocate the lowest positions for the parameters|
-|Immediate Numbers|No need to store. Just record their values in the corresponding **varible records**.|
+|Immediate Numbers|No need to store. Just record their values in the corresponding **variable records**.|
 
 ### How to Load (into Registers) and Store (from Registers)
 |Variable Type|Load|Store|
@@ -716,13 +718,13 @@ There are some simple optimizations that can be done:
   - replacing ```beq``` with ```ble```, ```bge``` and ```bne``` to reduce one operation.
 
 ## Personal Thinking about the Relation between the Front End and the Back End
-Somehow it is just like the relation between the two phase of a linker (symbol resolution and relocation):  
+Somehow it is just like the relation between the two phases of a linker (symbol resolution and relocation):  
   - The former deals with symbol resolution.
   - The latter deals with resource allocation.
 
 In this sense, the former is mainly mathematical things. People always say that, the front end maps variables to "virtual registers". From my point of view, this is just like the directory of the Linux file system or the DNS, which maps something (resource identifiers) represented by letters (which is friendly to humans) to something represented by numbers (which is easier to be processed by math and thus friendly to machines). Specifically, the front end maps variables indexed by their names in high-level language into something that should be held somewhere in the memory hierarchy in the future (by the back end).  
 
-When it comes to the back end, people always come up with "register allocation" first. In my opinion, "register allocation" is highly interrelated with "stack allocation". Although the size of stack can be considered endless while the number of registers are limited (but enough at most of the time according to my daily experiences), they both belong to "resource allocation". Obviously, stack should also be reused as much as possible for the sake of locality.  
+When it comes to the back end, people always come up with "register allocation" first. In my opinion, "register allocation" is highly interrelated with "stack allocation". Although the size of stack can be considered endless while the number of registers is limited (but enough at most of the time according to my daily experiences), they both belong to "resource allocation". Obviously, stack should also be reused as much as possible for the sake of locality.  
 
 Leaving from the front end to the back end, the world seems quite different. Mathematical things usually involve few corner cases and are quite elegant and always concise. When confronted with the reality, much more consideration and scrutiny are required.  
 
