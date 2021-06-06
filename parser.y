@@ -875,16 +875,10 @@ LAndExp       : EqExp
                     int FalseLabel=((JumpAddr*)$-1)->FalseLabel;
                     emit("if "+((Var*)$1)->getname()+"== 0 goto l"+to_string(FalseLabel));                    
                 }
-              | LAndExp AND
-              {
-                  int TrueLabel=((JumpAddr*)$-1)->TrueLabel;
-                  int FalseLabel=((JumpAddr*)$-1)->FalseLabel;
-                  $2=new JumpAddr(TrueLabel,FalseLabel);
-              } 
-               EqExp
+              | LAndExp AND EqExp
                 {
                     int FalseLabel=((JumpAddr*)$-1)->FalseLabel;
-                    emit("if "+((Var*)$4)->getname()+"== 0 goto l"+to_string(FalseLabel));                    
+                    emit("if "+((Var*)$3)->getname()+"== 0 goto l"+to_string(FalseLabel));                    
                 }
               ;
 LOrExp        : LAndExp 
