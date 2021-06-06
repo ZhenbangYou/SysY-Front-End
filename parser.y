@@ -890,13 +890,12 @@ LOrExp        : LAndExp
               }
               | LOrExp OR
               {
-                  int TrueLabel=((JumpAddr*)$-1)->TrueLabel;
                   int FalseLabel=NewLabel();
-                  $2=new JumpAddr(TrueLabel,FalseLabel);
+                  $2=new JumpAddr(0,FalseLabel);
               } 
               LAndExp 
               {
-                  int TrueLabel=((JumpAddr*)$2)->TrueLabel;
+                  int TrueLabel=((JumpAddr*)$-1)->TrueLabel;
                   emit("goto l"+to_string(TrueLabel));
 
                   emitLabel(((JumpAddr*)$2)->FalseLabel);
