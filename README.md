@@ -49,7 +49,7 @@ Distinct from the designs of my classmates, mine is the so-called "one-pass inte
 
 Every time I talk about my plan to implement a one-pass front end, people tend to question it. Among those questioned I have heard, the most frequently raised two are:   
   - Q: How to deal with **short circuit attributes**?  
-  - A: By "**Inherited Attributes**" and **Embedded Actions**. (PS: This can also be implemented without **Inherited Attributes**, which can be even easier to come up with and implement. See this new scheme in *parser_without_inherited_attributes.y*)  
+  - A: By **Inherited Attributes** and **Embedded Actions**. (PS: This can also be implemented without **Inherited Attributes**, which can be even easier to come up with and implement. See this new scheme in *parser_without_inherited_attributes.y*)  
   - Q: How to meet the requirements of *Eeyore* that all definitions of local variables should appear at the beginning of the functions they belong to?  
   - A: From a rigorous perspective, this is really the only thing that cannot be overcome by one-pass scheme. Practically speaking, we might as well ignore this requirement and reorder instructions as the final step, which is trivial.  
 
