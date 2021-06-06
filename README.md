@@ -354,8 +354,8 @@ LAndExp ->
 | LAndExp_1 && Atom {LAndExp.False = LAndExp_1.False; print("if Atom == 0 goto LAndExp.False");}
 
 LOrExp -> 
-              LAndExp {LOrExp.True = NewLabel();    print("goto LOrExp.True"); printLabel("LAndExp.False");}
-| LOrExp_1 || LAndExp {LOrExp.True = LOrExp_1.True; print("goto LOrExp.True"); printLabel("LAndExp.False");}
+              LAndExp {LOrExp.True = NewLabel();    print("goto LOrExp.True"); print_label(LAndExp.False);}
+| LOrExp_1 || LAndExp {LOrExp.True = LOrExp_1.True; print("goto LOrExp.True"); print_label(LAndExp.False);}
 
 Cond -> 
 LOrExp {Cond.True = LOrExp.True; print("goto Cond.False");}
@@ -376,6 +376,8 @@ L1:  // True entrance
 L3:  // False entrance
 ...
 ```
+Indeed, the core idea of this scheme is the same as backpatching. The difference is, in this scheme, a label is generated when a new list is created, since we do not need to bind labels to addresses.  
+
 Now have a break and rethink if you have fully grasped all the ideas and details involved in the SDT and the example. I know it is far from being easy. Unfortunately, the scheme we will discuss next, namely the **top-down** one, is even harder to understand and come up with.  
 
 As for the **top-down** scheme, 
@@ -389,10 +391,10 @@ Cond ->
 {LOrExp.True = Cond.True;} LOrExp {Cond.False = NewLabel(); print("goto Cond.False");}
 
 LOrExp -> 
-{LAndExp.False=NewLabel();} LAndExp {print("goto LOrExp.True"); printLabel("LAndExp.False");}
+{LAndExp.False=NewLabel();} LAndExp {print("goto LOrExp.True"); print_label(LAndExp.False);}
 |
 {LOrExp_1.True = LOrExp.True;} LOrExp_1 || 
-{LAndExp.False=NewLabel();} LAndExp {print("goto LOrExp.True"); printLabel("LAndExp.False");}
+{LAndExp.False=NewLabel();} LAndExp {print("goto LOrExp.True"); print_label(LAndExp.False);}
 
 LAndExp -> 
 Atom {print("if Atom == 0 goto LAndExp.False");}
@@ -400,6 +402,8 @@ Atom {print("if Atom == 0 goto LAndExp.False");}
 LAndExp_1 && 
 Atom {print("if Atom == 0 goto LAndExp.False");}
 ```
+Note that the implementation of this SDT in *Yacc* requires some adjustments. As a result, astute readers will find some differences in the parse table below. More precisely, since the first elements of the two production rules headed by *LOrExp* are both actions, leading to a reduce/reduce conflict. You may figure out the adjustments with the help of the parse table.  
+
 As an instance for this SDT, I will show the reducing process of ```Atom_00 && Atom_01 || Atom_10 && Atom_11``` (the third time we have talked about this example!).  
 
 The reducing process without actions is as follows:  
