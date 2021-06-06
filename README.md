@@ -20,6 +20,8 @@ Hopefully, anyone meeting the following prerequisites can implement his or her o
 This code generator translates *SysY* in to *Eeyore*.  
   - For the definition of *SysY*, see [here](https://pku-minic.github.io/online-doc/#/sysy/). Basically, it is a subset of C.  
   - For the definition of *Eeyore*, see [here](https://pku-minic.github.io/online-doc/#/ir/eeyore). It is an intermediate representation (IR) for compilers that translate *C* into *RISC-V*.  
+  - For the definition of *Tigger*, see [here](https://pku-minic.github.io/online-doc/#/ir/tigger). It is a common IR for *RISC-V*. Compared with *Eeyore*, registers and stack have been allocated in *Tigger*.
+  - For the definition of *RISC-V*, refer to its official documentation or see [here](https://pku-minic.github.io/online-doc/#/ir/riscv) if you just want to accomplish this project.
 
 I feel it quite necessary to record my thoughts about the planning and developing of this project, which is exactly the origin of the first version of this documentation. But now I feel it even more meaningful to organize my thoughts so that others can build a compiler that is able to pass all the functional tests in a short period of time.  
 
@@ -660,7 +662,47 @@ It is all about instruction reordering. Variable declarations should be moved to
 To determine the type of instructions (whether being a declaration, an initialization or something else), remove the output of indent and examining the a few letters at the beginning of each instruction is enough.  
 
 ## A Complete Compiler (SysY to RISC-V)
-### 
+Since this documentation is for the front end, I will not delve into the back end. However, completing a front end means that you can easily obtain a functionally correct compiler. The part aims to tell you how to realize this quickly.  
+
+### Into Tigger
+For simplicity, you do not need extra code to translate *Eeyore* into *Tigger*. Just modify the existing code generator!  
+
+Only keypoints are discussed here, details like how to computer the size of the stack frame should be figured out by readers, since they are way too easy.  
+
+### Variable Type in Tigger
+There are six types of variables in *Tigger*:  
+  - local scalars variables (not constants).
+  - local arrays (can be variable or constant).
+  - global scalars variables (not constants).
+  - global arrays (can be variable or constant).
+  - parameters.
+  - immediate numbers (i.e., scalar constants).
+
+### Place to Hold Variables
+|Variable Type|Place to Hold Variables|
+|:---|:---|
+|Local Scalars|Stack. The earlier the variable comes, the lower it is placed (i.e., the closer it is to the stack pointer). The placing order also applies to local arrays.|
+|Local Arrays|Stack. The value of the array name is equal to the address of the first element.|
+|Global Scalars|*.common* or *.data*, but only the former is used in our design. This also applies to global arrays.|
+|Global Arrays|*.common* or *.data*. **The array name identifies the first element of the array, rather than the address of the first element!**|
+|Parameters|Should be stored in the stack, as parameter registers may be garbles during function calls. For convenience, just allocate the lowest positions for the parameters|
+|Immediate Numbers|No need to store. Just record their values in the corresponding **varible records**.|
+
+### How to Load (into Registers) and Store (from Registers)
+|Variable Type|Load|Store|
+|:---|:---|:---|
+|Local Scalars|"load"|"store"|
+|Names of Local Arrays|"loadaddr"|(not applicable)|
+|Global Scalars|"load"|"loadaddr" then store like an array access|
+|Names of Global Arrays|"loadaddr"|(not applicable)|
+|Parameters|"load"|"store"|
+|Immediate Numbers|"="|(not applicable)|
+|Array Accesses|```x = a[i]``` to ```b = a + i```  ```x = b[0]```|```a[i] = x``` to ```b = a + i```  ```b[0] = x```|
+
+## Into RISC-V
+This part is even more trivial. You can finish this with mere macro expansion.  
+
+Pay attention to the range of immediate number field (it appears nearly everywhere, including the computation of the stack pointer) in the instruction format of *RISC-V*. By the way, this also serves as an important means for optimizations!  
 
 ## Acknowledgments
 Thanks to my teachers, classmates, group members and roommates, also teaching assistants. Without their help, the design and implementation of this project will surely not be so smooth.  
