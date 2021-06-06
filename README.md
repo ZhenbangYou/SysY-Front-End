@@ -125,6 +125,7 @@ I have been always hearing students saying that, "I am not good at programming, 
 
 My answer always come in the following way:  
   - Get your hands dirty with some trivial parts, no matter how trivial it is. In my design, **Step 1,2 and 3** are all quite simple. However, they can really help you procure confidence! Indeed, once you finish the **short circuit expression**, there will no longer be any essential obstruction.
+  - As a piece of good news, there is virtually no (if any) corner case in the front end as long as you design does not violate the semantic.
   - Although you do need to consider the general framework before getting started, it is both unnecessary and impossible to get every detail clear. In reality, it suffices to prove the feasibility mathematically. Besides, the feasibility has been proved by this project practically. Why not just have a try?
 
 ## Thoughts of Each Step
@@ -713,6 +714,17 @@ As is shown by the field tests, the former scheme outperforms the latter one by 
 There are some simple optimizations that can be done:
   - cascade ```goto``` elimination.
   - replacing ```beq``` with ```ble```, ```bge``` and ```bne``` to reduce one operation.
+
+## Personal Thinking about the Relation between the Front End and the Back End
+Somehow it is just like the relation between the two phase of a linker (symbol resolution and relocation):  
+  - The former deals with symbol resolution.
+  - The latter deals with resource allocation.
+
+In this sense, the former is mainly mathematical things. People always say that, the front end maps variables to "virtual registers". From my point of view, this is just like the directory of the Linux file system or the DNS, which maps something (resource identifiers) represented by letters (which is friendly to humans) to something represented by numbers (which is easier to be processed by math and thus friendly to machines). Specifically, the front end maps variables indexed by their names in high-level language into something that should be held somewhere in the memory hierarchy in the future (by the back end).  
+
+When it comes to the back end, people always come up with "register allocation" first. In my opinion, "register allocation" is highly interrelated with "stack allocation". Although the size of stack can be considered endless while the number of registers are limited (but enough at most of the time according to my daily experiences), they both belong to "resource allocation". Obviously, stack should also be reused as much as possible for the sake of locality.  
+
+Leaving from the front end to the back end, the world seems quite different. Mathematical things usually involve few corner cases and are quite elegant and always concise. When confronted with the reality, much more consideration and scrutiny are required.  
 
 ## Acknowledgments
 Thanks to my teachers, classmates, group members and roommates, also teaching assistants. Without their help, the design and implementation of this project will surely not be so smooth.  
