@@ -65,7 +65,7 @@ In addition, since I can output code intermediately, I can easily check the corr
 **Contribution**  
 This is the first one-pass code generator in this semester. What's more, to the best of my knowledge, those who also implement their compilers in this way are all deeply affected by this project, either encouraged by the success of this project or inspired by the design scheme adopted by this project. One of the classmates told me that, since the feasibility and simplicity of the one-pass scheme had been convincingly proved by this project, he was so confident about this scheme that he finally implement in this way and also achieved fairly high developing efficiency.  
 
-You may ask about how to verify the feasibility, given that this is exactly the first work. The answer is, actually, quite simple: by mathematics. Specifically, the toughest part of verification lies in those requiring *inherited attributes*. However, as is shown in the aside in *chapter 5.5.4* of *Dragon Book*, **an L-attributed SDD on an LL grammar can be adapted to an equivalent SDD on an LR grammar**, which absolutely solve the problem raised above.  
+You may ask about how to verify the feasibility, given that this is exactly the first work. The answer is, actually, quite simple: by mathematics. Specifically, the toughest part of verification lies in those requiring *inherited attributes*. However, as shown in the aside in *chapter 5.5.4* of *Dragon Book*, **an L-attributed SDD on an LL grammar can be adapted to an equivalent SDD on an LR grammar**, which absolutely solve the problem raised above.  
 
 **Aside**  
 **Inherited Attributes** mentioned in this documentation is different from that in the *dragon book*. Admittedly, attributes inherited from siblings are used in this project. However, from the perspective of implementation, this kind of attributes can be implemented in the same way as **synthesized attributes**. Specifically, notations in the form of a dollar followed by a non-positive number such as $-1 will not be used in one of the implementations. This is quite important since notations like $-1 is much trickier to handle correctly.  
@@ -77,7 +77,7 @@ There are mainly 2 ways:
 
 Nearly all of my classmates choose the former; however, I prefer the latter. Just as is discussed above, this is the fundamental reason for the one-pass scheme.  
 
-In addition, **incremental developing** helps a lot. Specifically, by dividing the project into several steps as is shown below and testing each part on finishing (by virtue of the one-pass scheme), a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-effective.  
+In addition, **incremental developing** helps a lot. Specifically, by dividing the project into several steps as shown below and testing each part on finishing (by virtue of the one-pass scheme), a miracle occurred that I do not even need to debug after the whole project is done, which is extremely time-effective.  
 
 No matter how you design your own compiler, keep in mind that for the convenience of debugging, your compiler had better **output enough information in every step**. Some students design compilers in a way that output can only be obtained after the whole project is finished; as a consequence of this, the difficulty of debugging is truly prohibitive!  
 
@@ -204,7 +204,7 @@ The central problem is, what to do when a new variable is created? The answer is
   - Determine the sequence number, which can be done by adding a *static* field (*count* in class *Var* in this project).
   - Insert the **variable record** into the top of **symbol table stack**.
 
-As is shown above, parameters are not needed for this kind of variables. Also, we do not need to record the name of variable in its **variable record**.  
+As shown above, parameters are not needed for this kind of variables. Also, we do not need to record the name of variable in its **variable record**.  
 
 As for the name appearing in the generated code, you can add a method in the **variable record** that returns the name of the variable (*getname* in class *Var* in this project).
 
@@ -325,7 +325,7 @@ For each component, when a label is needed, there are only 2 ways to obtain it:
   - generate by itself.
   - inherit from others.
 
-Also, as is shown in the above example, one label may be shared by more than one components. That being said, only one of them generate the label, others just inherit it. Therefore, the core of the scheme is:
+Also, as shown in the above example, one label may be shared by more than one components. That being said, only one of them generate the label, others just inherit it. Therefore, the core of the scheme is:
   - who is responsible for generating the label?
   - from whom does a component inherit the label?
 
@@ -486,7 +486,7 @@ After:
 ```
 where ```Cond.true = Body``` and ```Cond.false = After```.  
 
-As is shown above, both *if* and *while* need 3 labels. When to generate these labels depends on the translation scheme of the **short circuit expression**:
+As shown above, both *if* and *while* need 3 labels. When to generate these labels depends on the translation scheme of the **short circuit expression**:
   - For the **bottom-up** scheme, *Cond.true* is generated during the translation process of *Cond*.
   - For the **top-down** scheme, *Cond.true* and *Cond.false* are both needed during the translation process of *Cond*, so these 2 labels should be generated before *Cond*.
 
@@ -715,7 +715,7 @@ There is a subtle detail regarding performance. Recall that the lowest positions
   - Allocate 8 positions, no matter how many parameters there are.
   - Allocate positions according to the number of parameters.
 
-As is shown by the field tests, the former scheme outperforms the latter one by a noticeable margin. My guess is that, this has something to do with cache locality and thrashing.  
+As shown by the field tests, the former scheme outperforms the latter one by a noticeable margin. My guess is that, this has something to do with cache locality and thrashing.  
 
 There are some simple optimizations that can be done:
   - cascade ```goto``` elimination.
