@@ -720,6 +720,13 @@ As shown by the field tests, the former scheme outperforms the latter one by a n
 There are also some simple optimizations that can be done:
   - cascade ```goto``` elimination . This needs one more pass.
   - replacing ```beq``` with ```ble```, ```bge``` and ```bne``` to reduce one operation. More precisely, when encountering relation expressions, do not solve them immediately. You may add a new data structure for this, which records two operands. When a new operand emerges, solve the first two. In this way, it is guaranteed that there are always no more than two outstanding operands, which can be accommodated by a conditional branch instruction.
+  - redundant label elimination.
+  - redundant goto (whose target address is exactly the next instruction) elimination.
+  - redundant load (the value is already in a register) elimination.
+  - redundant store (the value will not be used later) elimination.
+  - redundant store of ```ra``` elimination (for those functions that do not call other functions).
+
+Many optimizations above can be done iteratively, and all of these can be done in a quite simple way (without dataflow analysis and extra data structures, just **peephole**).  
 
 ## Personal Thinking about the Relation between the Front End and the Back End
 Somehow it is just like the relation between the two phases of a linker (symbol resolution and relocation):  
