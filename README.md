@@ -44,6 +44,10 @@ Primary principle: Avoiding Bugs through Simplicity.
 
 Important principles: Modularity, Regularity and Building Incrementally.
 
+## What Does "One Pass" Indicate
+  - The input file will be read only once.
+  - No code is stored. In other words, target code is emitted once it is generated. Only simple (array) data structures will be stored like subscripts of array accesses.
+
 ## Uniqueness
 Distinct from the designs of my classmates, mine is the so-called "one-pass intermediate code generator" which I believe is exactly the pattern used in the industry to build a front end.  
 
