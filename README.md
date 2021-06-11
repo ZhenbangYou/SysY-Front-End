@@ -87,6 +87,8 @@ No matter how you design your own compiler, keep in mind that for the convenienc
 
 **How to debug**  
 
+"Fast Iteration" and "Unit Test".  
+
 Bugs are not formidable, as long as they are restricted in limited area and can be easily fixed. This is exactly the wonderful characteristic of this design!  
 
 Besides, this documentation provides exhaustive guideline on how to construct test cases. You can verify your compiler by reading the output code of these cases.  
