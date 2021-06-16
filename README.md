@@ -1,4 +1,4 @@
-# SysY-Front-End: A One-Pass Intermediate Code Generator
+# SysY Front End: A One-Pass Intermediate Code Generator
 
 ## Preface
 This documentation aims to be an intelligible and readable tutorial for everyone who wants to get his or her hands dirty with a real compiler. Admittedly, this is just a toy compiler with evidently poor performance. However, it is due to simplicity and conciseness that this tiny compiler can serve as a material for first step learning.  
@@ -725,7 +725,7 @@ As shown by the field tests, the former scheme outperforms the latter one by a n
 
 There are also some simple optimizations that can be done:
   - cascade ```goto``` elimination . This needs one more pass.
-  - replacing ```beq``` with ```ble```, ```bge``` and ```bne``` to reduce one operation. More precisely, when encountering relation expressions, do not solve them immediately. You may add a new data structure for this, which records two operands. When a new operand emerges, solve the first two. In this way, it is guaranteed that there are always no more than two outstanding operands, which can be accommodated by a conditional branch instruction.
+  - replacing ```beq``` with other conditional jump instructions such as ```ble```, ```bge``` and ```bne``` to reduce one operation. More precisely, when encountering relation expressions, do not solve them immediately. You may add a new data structure for this, which records two operands. When a new operand emerges, solve the first two. In this way, it is guaranteed that there are always no more than two outstanding operands, which can be accommodated by a conditional branch instruction.
   - redundant label elimination.
   - redundant goto (whose target address is exactly the next instruction) elimination.
   - redundant load (the value is already in a register) elimination.
