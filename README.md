@@ -388,8 +388,8 @@ Now have a break and rethink if you have fully grasped all the ideas and details
 
 As for the **top-down** scheme, 
   - *Cond* obtain its true and false labels, either by generating by itself, or by inheriting from its siblings (in *if* statements or *while* loops).
-  - *Cond* passes its true label to *LOrExp*.
-  - *LOrExp* generates a false label and passes it to *LAndExp*.
+  - *Cond* passes its true label to the first *LOrExp*; the other *LOrExp* inherits this very label from its predecessor (also an *LOrExp*).
+  - *LOrExp* generates a false label and passes it to the first *LAndExp*; the other *LAndExp* inherits this very label from its predecessor (also an *LAndExp*).
 
 The complete SDT is as follows:  
 ```
