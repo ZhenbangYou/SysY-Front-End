@@ -733,6 +733,7 @@ There are also some simple optimizations that can be done:
   - redundant load (the value is already in a register) elimination.
   - redundant store (the value will not be used later) elimination.
   - redundant store of ```ra``` elimination (for those functions that do not call other functions).
+  - distinguishing left values and right values to reduce the amount of array accesses.
 
 Many optimizations above can be done iteratively, and all of these can be done in a quite simple way (without dataflow analysis and extra data structures, just **peephole**).  
 
