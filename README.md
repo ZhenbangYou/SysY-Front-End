@@ -3,7 +3,9 @@
 ## Preface
 This documentation aims to be an intelligible and readable tutorial for everyone who wants to get his or her hands dirty with a real compiler. Admittedly, this is just a toy compiler with evidently poor performance. However, it is due to simplicity and conciseness that this tiny compiler can serve as a material for first step learning.  
 
-Finding either the documentation or code obscure or unintelligible, please contact me or just blame in github. The success of this project relies on the readability to a large extent.  
+Finding either the documentation or code obscure or unintelligible, please contact me or just blame in github. I am keep updating this documentation. The success of this project relies on the readability to a large extent.  
+
+In addition, this documentation contains brief introduction to the implementation of a back end with some peephole optimizations. I am aimed at releasing another documentation that concentrates on optimization after the compiler system design contest held by CCF. Anyway, readers can still build a functionally correct compiler (a whole compiler!) with this documentation.  
 
 By the way, do not forget to check the prerequisites below, though there are just little of them.  
 
